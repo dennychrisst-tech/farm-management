@@ -60,6 +60,19 @@ export default async function ReportDetailPage({
     .eq("daily_report_id", report.id)
     .maybeSingle()
 
+  const { data: evidence } = await supabase
+    .from("evidence")
+    .select("*")
+    .eq("daily_report_id", report.id)
+    .order("created_at")
+
+  const evidenceWithUrls = await Promise.all(
+    (evidence ?? []).map(async (e) => {
+      const { data } = await supabase.storage.from("evidence").createSignedUrl(e.storage_path, 3600)
+      return { ...e, url: data?.signedUrl ?? null }
+    })
+  )
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -73,6 +86,7 @@ export default async function ReportDetailPage({
         <CardContent className="space-y-2 text-sm">
           <Row label="Populasi awal" value={`${report.opening_population} ekor`} />
           <Row label="Mortalitas" value={`${report.mortality} ekor`} />
+          {report.mortality_note && <Row label="Sebab kematian" value={report.mortality_note} />}
           <Row label="Populasi akhir" value={`${report.closing_population} ekor`} />
           <Separator />
           <Row label="Total telur" value={`${kpi?.total_eggs ?? "-"} butir`} />
@@ -82,6 +96,32 @@ export default async function ReportDetailPage({
           {report.notes && <Row label="Catatan" value={report.notes} />}
         </CardContent>
       </Card>
+
+      {evidenceWithUrls.length > 0 && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Foto Evidence</CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+            {evidenceWithUrls.map((e) => (
+              <div key={e.id} className="relative aspect-square overflow-hidden rounded-md border">
+                {e.url && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={e.url} alt="Evidence" className="h-full w-full object-cover" />
+                )}
+                <div className="absolute inset-x-0 bottom-0 bg-black/60 px-1 py-0.5 text-[10px] text-white">
+                  {e.captured_at &&
+                    new Date(e.captured_at).toLocaleTimeString("id-ID", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  {e.latitude !== null && ` · ${e.latitude?.toFixed(4)},${e.longitude?.toFixed(4)}`}
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   )
 }

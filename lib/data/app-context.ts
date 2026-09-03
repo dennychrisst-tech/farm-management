@@ -67,11 +67,15 @@ export async function requireOwnerContext(): Promise<AppContext> {
   return ctx
 }
 
-export function flockAgeWeeks(flock: Tables<"flocks">): number {
+export function flockAgeDays(flock: Tables<"flocks">): number {
   const arrival = new Date(flock.arrival_date)
   const now = new Date()
   const daysSinceArrival = Math.floor(
     (now.getTime() - arrival.getTime()) / (1000 * 60 * 60 * 24)
   )
-  return flock.arrival_age_weeks + Math.floor(daysSinceArrival / 7)
+  return flock.arrival_age_weeks * 7 + daysSinceArrival
+}
+
+export function flockAgeWeeks(flock: Tables<"flocks">): number {
+  return Math.floor(flockAgeDays(flock) / 7)
 }

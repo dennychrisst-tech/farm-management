@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { CalendarDays, Users, ChevronRight } from "lucide-react"
+import { CalendarDays, Users, ChevronRight, Lightbulb, Wheat } from "lucide-react"
 
-import { getAppContext, flockAgeWeeks } from "@/lib/data/app-context"
+import { getAppContext, flockAgeWeeks, flockAgeDays } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -55,6 +55,17 @@ export default async function HomePage() {
   const ctaHref = todayReport ? `/report/${todayReport.id}` : "/report/new"
   const ctaLabel = todayReport && todayReport.status === "draft" ? "Lanjutkan Laporan" : "Isi Laporan Hari Ini"
 
+  const target = flock
+    ? (
+        await supabase
+          .from("flock_targets")
+          .select("*")
+          .eq("flock_id", flock.id)
+          .eq("day_number", flockAgeDays(flock))
+          .maybeSingle()
+      ).data
+    : null
+
   return (
     <div className="space-y-4">
       <Card>
@@ -84,6 +95,35 @@ export default async function HomePage() {
           </div>
         </CardContent>
       </Card>
+
+      {target && (target.target_feed_kg_per_day !== null || target.light_schedule) && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Target Hari Ini (Program Supplier)</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {target.target_feed_kg_per_day !== null && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Wheat className="size-4" /> Target pakan
+                </span>
+                <span className="font-medium">
+                  {target.target_feed_morning_kg} kg pagi + {target.target_feed_evening_kg} kg sore
+                  {" "}({target.target_feed_kg_per_day} kg)
+                </span>
+              </div>
+            )}
+            {target.light_schedule && (
+              <div className="flex items-center justify-between text-sm">
+                <span className="flex items-center gap-2 text-muted-foreground">
+                  <Lightbulb className="size-4" /> Jadwal lampu
+                </span>
+                <span className="font-medium">{target.light_schedule}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <Button asChild size="lg" className="h-14 w-full text-base">
         <Link href={ctaHref}>

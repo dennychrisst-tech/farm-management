@@ -230,6 +230,7 @@ export type Database = {
           flock_id: string
           id: string
           mortality: number
+          mortality_note: string | null
           notes: string | null
           opening_population: number
           population_adjustment: number
@@ -249,6 +250,7 @@ export type Database = {
           flock_id: string
           id?: string
           mortality?: number
+          mortality_note?: string | null
           notes?: string | null
           opening_population?: number
           population_adjustment?: number
@@ -268,6 +270,7 @@ export type Database = {
           flock_id?: string
           id?: string
           mortality?: number
+          mortality_note?: string | null
           notes?: string | null
           opening_population?: number
           population_adjustment?: number
@@ -568,6 +571,47 @@ export type Database = {
           },
         ]
       }
+      flock_targets: {
+        Row: {
+          created_at: string
+          day_number: number
+          flock_id: string
+          id: string
+          light_schedule: string | null
+          target_feed_evening_kg: number | null
+          target_feed_kg_per_day: number | null
+          target_feed_morning_kg: number | null
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          flock_id: string
+          id?: string
+          light_schedule?: string | null
+          target_feed_evening_kg?: number | null
+          target_feed_kg_per_day?: number | null
+          target_feed_morning_kg?: number | null
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          flock_id?: string
+          id?: string
+          light_schedule?: string | null
+          target_feed_evening_kg?: number | null
+          target_feed_kg_per_day?: number | null
+          target_feed_morning_kg?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flock_targets_flock_id_fkey"
+            columns: ["flock_id"]
+            isOneToOne: false
+            referencedRelation: "flocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       flocks: {
         Row: {
           arrival_age_weeks: number
@@ -794,6 +838,112 @@ export type Database = {
           },
         ]
       }
+      supply_items: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          farm_id: string
+          id: string
+          name: string
+          unit: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          farm_id: string
+          id?: string
+          name: string
+          unit?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          farm_id?: string
+          id?: string
+          name?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supply_items_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supply_transactions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          id: string
+          occurred_at: string
+          qty: number
+          reason: string | null
+          reference: string | null
+          supply_item_id: string
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          id?: string
+          occurred_at?: string
+          qty: number
+          reason?: string | null
+          reference?: string | null
+          supply_item_id: string
+          type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          id?: string
+          occurred_at?: string
+          qty?: number
+          reason?: string | null
+          reference?: string | null
+          supply_item_id?: string
+          type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supply_transactions_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_supply_item_id_fkey"
+            columns: ["supply_item_id"]
+            isOneToOne: false
+            referencedRelation: "supply_balances"
+            referencedColumns: ["supply_item_id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_supply_item_id_fkey"
+            columns: ["supply_item_id"]
+            isOneToOne: false
+            referencedRelation: "supply_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       daily_report_kpis: {
@@ -874,6 +1024,25 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "feed_products_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supply_balances: {
+        Row: {
+          balance: number | null
+          category: string | null
+          farm_id: string | null
+          name: string | null
+          supply_item_id: string | null
+          unit: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supply_items_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
             referencedRelation: "farms"

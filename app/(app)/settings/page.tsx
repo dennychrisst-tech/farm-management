@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 
 const links = [
   { href: "/settings/farm", label: "Data Farm", icon: Building2 },
-  { href: "/settings/feed-products", label: "Produk Pakan", icon: Wheat },
+  { href: "/settings/feed-products", label: "Produk & Suplai", icon: Wheat },
   { href: "/settings/thresholds", label: "Ambang Batas Alert", icon: SlidersHorizontal },
   { href: "/settings/users", label: "Pengguna", icon: Users },
 ]

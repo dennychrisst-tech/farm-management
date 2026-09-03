@@ -2,6 +2,7 @@ import { z } from "zod"
 
 export const dailyReportSchema = z.object({
   mortality: z.number().int().min(0, "Tidak boleh negatif"),
+  mortalityNote: z.string().max(500).optional(),
   cull: z.number().int().min(0, "Tidak boleh negatif"),
 
   morningFeedProductId: z.string().min(1, "Pilih produk pakan"),

@@ -44,6 +44,19 @@ export default async function NewReportPage() {
     .single()
 
   if (error || !created) {
+    // 23505 = unique_violation on (flock_id, report_date): another worker
+    // already created/submitted today's report. RLS hides that row from
+    // this worker (PRD: workers see only their own submitted report), so
+    // the earlier existence check can't catch this -- surface a clear
+    // message instead of the raw constraint error.
+    if (error?.code === "23505") {
+      return (
+        <p className="text-sm text-muted-foreground">
+          Laporan hari ini sudah diisi oleh pekerja lain. Hubungi Owner/Admin jika perlu melihat
+          detailnya.
+        </p>
+      )
+    }
     return (
       <p className="text-sm text-destructive">
         Gagal membuat laporan: {error?.message ?? "unknown error"}

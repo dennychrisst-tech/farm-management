@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { PhotoUploader } from "@/components/report/photo-uploader"
+import { PhotoUploader, type PhotoItem } from "@/components/report/photo-uploader"
 
 type FeedProduct = Tables<"feed_products">
 
@@ -50,13 +50,14 @@ export function ReportForm({
 }) {
   const router = useRouter()
   const [step, setStep] = useState<"form" | "confirm">("form")
-  const [photos, setPhotos] = useState<File[]>([])
+  const [photos, setPhotos] = useState<PhotoItem[]>([])
   const [submitting, setSubmitting] = useState(false)
 
   const form = useForm<DailyReportInput>({
     resolver: zodResolver(dailyReportSchema),
     defaultValues: {
       mortality: 0,
+      mortalityNote: "",
       cull: 0,
       morningFeedProductId: feedProducts[0]?.id ?? "",
       morningSacks: 0,
@@ -140,22 +141,29 @@ export function ReportForm({
 
       await supabase
         .from("daily_reports")
-        .update({ mortality: v.mortality, cull: v.cull, notes: v.notes || null })
+        .update({
+          mortality: v.mortality,
+          mortality_note: v.mortalityNote || null,
+          cull: v.cull,
+          notes: v.notes || null,
+        })
         .eq("id", reportId)
 
       if (photos.length > 0) {
-        for (const photo of photos) {
-          const ext = photo.name.split(".").pop() || "jpg"
+        for (const item of photos) {
+          const ext = item.file.name.split(".").pop() || "jpg"
           const path = `${farmId}/${reportId}/${crypto.randomUUID()}.${ext}`
           const { error: uploadError } = await supabase.storage
             .from("evidence")
-            .upload(path, photo, { upsert: false })
+            .upload(path, item.file, { upsert: false })
           if (uploadError) throw uploadError
 
           await supabase.from("evidence").insert({
             daily_report_id: reportId,
             storage_path: path,
-            captured_at: new Date().toISOString(),
+            captured_at: item.capturedAt,
+            latitude: item.latitude,
+            longitude: item.longitude,
           })
         }
       }
@@ -189,6 +197,7 @@ export function ReportForm({
           <CardContent className="space-y-3 text-sm">
             <Row label="Populasi awal" value={`${liveBirds.toLocaleString("id-ID")} ekor`} />
             <Row label="Mortalitas" value={`${values.mortality} ekor`} />
+            {values.mortalityNote && <Row label="Sebab kematian" value={values.mortalityNote} />}
             <Row label="Afkir (cull)" value={`${values.cull} ekor`} />
             <Row
               label="Populasi akhir"
@@ -281,6 +290,21 @@ export function ReportForm({
                 )}
               />
             </div>
+            {(values.mortality || 0) > 0 && (
+              <FormField
+                control={form.control}
+                name="mortalityNote"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Sebab kematian (opsional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="mis. terjepit, sakit, predator" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
         </Card>
 
@@ -573,7 +597,7 @@ export function ReportForm({
                 </FormItem>
               )}
             />
-            <PhotoUploader files={photos} onChange={setPhotos} />
+            <PhotoUploader photos={photos} onChange={setPhotos} />
           </CardContent>
         </Card>
 
