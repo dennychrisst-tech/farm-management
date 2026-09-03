@@ -44,7 +44,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SerwistProvider swUrl="/sw.js" register cacheOnNavigation reloadOnOnline>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

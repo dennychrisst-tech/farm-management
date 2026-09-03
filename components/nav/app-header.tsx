@@ -24,7 +24,7 @@ export function AppHeader({
   }
 
   return (
-    <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
+    <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3 md:hidden">
       <div>
         <p className="text-sm font-semibold leading-none">{farmName}</p>
         <p className="text-xs text-muted-foreground capitalize">{role}</p>

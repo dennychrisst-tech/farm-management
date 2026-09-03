@@ -2,40 +2,16 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import {
-  Home,
-  ClipboardList,
-  LayoutDashboard,
-  Package,
-  Bell,
-} from "lucide-react"
 
+import { navItemsForRole } from "@/lib/nav-items"
 import { cn } from "@/lib/utils"
-
-type NavItem = {
-  href: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-}
-
-const workerItems: NavItem[] = [
-  { href: "/home", label: "Beranda", icon: Home },
-  { href: "/reports", label: "Laporan", icon: ClipboardList },
-]
-
-const ownerItems: NavItem[] = [
-  { href: "/home", label: "Beranda", icon: Home },
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/inventory", label: "Stok", icon: Package },
-  { href: "/alerts", label: "Alert", icon: Bell },
-]
 
 export function BottomNav({ role }: { role: string }) {
   const pathname = usePathname()
-  const items = role === "owner" || role === "admin" ? ownerItems : workerItems
+  const items = navItemsForRole(role)
 
   return (
-    <nav className="sticky bottom-0 z-10 border-t bg-background">
+    <nav className="sticky bottom-0 z-10 border-t bg-background md:hidden">
       <ul className="mx-auto flex max-w-lg items-stretch justify-around">
         {items.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/")

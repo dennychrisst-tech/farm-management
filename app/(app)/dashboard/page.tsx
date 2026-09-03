@@ -1,10 +1,15 @@
+import Link from "next/link"
+import { Egg, Users, TrendingUp, Package, Plus, Sun } from "lucide-react"
+
 import { requireOwnerContext, flockAgeWeeks } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
 import { KpiTile } from "@/components/dashboard/kpi-tile"
 import { TrendChart } from "@/components/dashboard/trend-chart"
+import { EggCompositionChart } from "@/components/dashboard/egg-composition-chart"
 import { AlertList } from "@/components/dashboard/alert-list"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 const MILESTONES = [5, 10, 25, 50, 75, 90]
 
@@ -12,8 +17,16 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10)
 }
 
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 11) return "Selamat pagi"
+  if (h < 15) return "Selamat siang"
+  if (h < 18) return "Selamat sore"
+  return "Selamat malam"
+}
+
 export default async function DashboardPage() {
-  const { farm, flock } = await requireOwnerContext()
+  const { farm, flock, profile } = await requireOwnerContext()
   const supabase = await createClient()
 
   if (!flock) {
@@ -48,85 +61,138 @@ export default async function DashboardPage() {
     ])
 
   const minCoverageDays = stock?.length
-    ? Math.min(
-        ...stock.map((s) => s.coverage_days_actual ?? s.coverage_days_target ?? Infinity)
-      )
+    ? Math.min(...stock.map((s) => s.coverage_days_actual ?? s.coverage_days_target ?? Infinity))
     : null
 
   const reachedSet = new Set((reachedMilestones ?? []).map((m) => m.milestone_pct))
 
   return (
-    <div className="space-y-4">
-      <div>
-        <h1 className="text-lg font-semibold">Dashboard Produksi</h1>
-        <p className="text-sm text-muted-foreground">{farm.name}</p>
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Ringkasan Peternakan</h1>
+          <p className="text-sm text-muted-foreground">Pantau peternakan Anda, tumbuh lebih baik.</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <p className="hidden text-sm text-muted-foreground sm:block">
+            {new Date().toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+          </p>
+          <Button asChild>
+            <Link href="/report/new">
+              <Plus className="size-4" /> Catat Produksi
+            </Link>
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2">
-        <KpiTile label="Populasi hidup" value={flock.current_population.toLocaleString("id-ID")} />
-        <KpiTile label="Umur flock" value={`${flockAgeWeeks(flock)} mgg`} />
-        <KpiTile label="Telur hari ini" value={`${todayKpi?.total_eggs ?? 0}`} />
-        <KpiTile label="HDP hari ini" value={`${todayKpi?.hdp_pct ?? 0}%`} />
-        <KpiTile label="Pakan hari ini" value={`${todayKpi?.actual_feed_kg ?? 0} kg`} />
-        <KpiTile label="Pakan/ekor" value={`${todayKpi?.feed_intake_g_per_bird ?? 0} g`} />
-        <KpiTile label="Mortalitas" value={`${todayKpi?.mortality ?? 0} ekor`} />
+      <Card className="border-none bg-primary py-0 text-primary-foreground">
+        <CardContent className="flex items-center gap-4 px-6 py-6">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
+            <Sun className="size-6" />
+          </span>
+          <div>
+            <p className="text-lg font-semibold">
+              {greeting()}, {profile.name}
+            </p>
+            <p className="text-sm text-primary-foreground/80">
+              Semoga hari ini penuh berkah dan panen telur berkualitas.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiTile
-          label="Stok pakan tersisa"
-          value={minCoverageDays === null || minCoverageDays === Infinity ? "-" : `${minCoverageDays.toFixed(1)} hr`}
+          icon={Egg}
+          label="Produksi Telur Hari Ini"
+          value={`${(todayKpi?.total_eggs ?? 0).toLocaleString("id-ID")} butir`}
+        />
+        <KpiTile
+          icon={Users}
+          label="Populasi Ayam"
+          value={`${flock.current_population.toLocaleString("id-ID")} ekor`}
+          sub={`Umur ${flockAgeWeeks(flock)} minggu`}
+        />
+        <KpiTile icon={TrendingUp} label="Hen Day Production" value={`${todayKpi?.hdp_pct ?? 0}%`} />
+        <KpiTile
+          icon={Package}
+          label="Stok Pakan"
+          value={
+            minCoverageDays === null || minCoverageDays === Infinity
+              ? "-"
+              : `${minCoverageDays.toFixed(1)} hari`
+          }
+          sub="estimasi coverage"
           tone={minCoverageDays !== null && minCoverageDays < 10 ? "danger" : "default"}
         />
       </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Tren Produksi (HDP)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <TrendChart
-            data={(trend ?? []).filter(
-              (t): t is typeof t & { report_date: string } => t.report_date !== null
-            )}
-          />
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="text-base">Tren Produksi Telur</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TrendChart
+              data={(trend ?? []).filter(
+                (t): t is typeof t & { report_date: string } => t.report_date !== null
+              )}
+            />
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Target vs Aktual Pakan</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Target</span>
-            <span>{todayKpi?.feed_target_kg ?? 0} kg</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Aktual</span>
-            <span className="font-medium">{todayKpi?.actual_feed_kg ?? 0} kg</span>
-          </div>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Komposisi Telur</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <EggCompositionChart
+              normalEggs={todayKpi?.normal_eggs ?? 0}
+              abnormalEggs={todayKpi?.abnormal_eggs ?? 0}
+            />
+          </CardContent>
+        </Card>
+      </div>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Milestone HDP</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-wrap gap-2">
-          {MILESTONES.map((m) => (
-            <Badge key={m} variant={reachedSet.has(m) ? "default" : "outline"}>
-              {m}%
-            </Badge>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Target vs Aktual Pakan</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Target</span>
+              <span>{todayKpi?.feed_target_kg ?? 0} kg</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Aktual</span>
+              <span className="font-medium">{todayKpi?.actual_feed_kg ?? 0} kg</span>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium">Alert Terbaru</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AlertList alerts={alerts ?? []} />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Milestone HDP</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-wrap gap-2">
+            {MILESTONES.map((m) => (
+              <Badge key={m} variant={reachedSet.has(m) ? "default" : "outline"}>
+                {m}%
+              </Badge>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Alert Terbaru</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <AlertList alerts={alerts ?? []} />
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
