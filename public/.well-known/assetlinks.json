@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "id.dylanchickenfarm.layerfarm",
+        "sha256_cert_fingerprints": ["8B:FF:61:1E:D9:94:84:11:43:3C:31:7C:BB:DC:CD:82:59:04:EA:FD:01:6D:4C:60:74:CC:1C:BB:D1:E8:4D:AD"]
+      }
+    }]

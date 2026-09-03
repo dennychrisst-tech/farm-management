@@ -48,3 +48,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# Android signing key + build artifacts (never commit signing material)
+/android-release/
