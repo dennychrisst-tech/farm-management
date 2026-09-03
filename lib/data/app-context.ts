@@ -58,6 +58,15 @@ export async function getAppContext(): Promise<AppContext> {
   return { userId: user.id, profile, farm, flock: flock ?? null }
 }
 
+/** Same as getAppContext, but redirects non owner/admin roles to /home. */
+export async function requireOwnerContext(): Promise<AppContext> {
+  const ctx = await getAppContext()
+  if (ctx.profile.role !== "owner" && ctx.profile.role !== "admin") {
+    redirect("/home")
+  }
+  return ctx
+}
+
 export function flockAgeWeeks(flock: Tables<"flocks">): number {
   const arrival = new Date(flock.arrival_date)
   const now = new Date()
