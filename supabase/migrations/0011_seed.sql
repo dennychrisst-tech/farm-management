@@ -2,7 +2,7 @@
 -- user-seeding scripts (Phase 3) can reference it directly.
 
 insert into public.farms (id, name, timezone, tray_size, sack_weight_kg, container_sacks)
-values ('00000000-0000-0000-0000-000000000001', 'Bangun Layer Farm', 'Asia/Jakarta', 30, 50, 160);
+values ('00000000-0000-0000-0000-000000000001', 'Dylan Chicken Farm', 'Asia/Jakarta', 30, 50, 160);
 
 -- Arrival age 16 weeks, age at discovery 20 weeks -> arrival was 4 weeks (28 days) ago.
 insert into public.flocks (farm_id, arrival_date, arrival_age_weeks, initial_population, current_population, status)

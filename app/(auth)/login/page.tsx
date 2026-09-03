@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
+import { Egg } from "lucide-react"
 
 import { createClient } from "@/lib/supabase/client"
 import { loginSchema, type LoginInput } from "@/lib/validation/auth"
@@ -45,10 +46,28 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-full flex-1 items-center justify-center p-4">
-      <Card className="w-full max-w-sm">
+    <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden p-4">
+      <video
+        className="absolute inset-0 -z-20 h-full w-full object-cover"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+      >
+        <source src="/videos/login-background.webm" type="video/webm" />
+        <source src="/videos/login-background.mp4" type="video/mp4" />
+      </video>
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
+
+      <Card className="w-full max-w-sm border-white/15 bg-white/90 backdrop-blur-md dark:bg-black/60">
         <CardHeader>
-          <CardTitle className="text-xl">LayerFarm</CardTitle>
+          <div className="mb-1 flex items-center gap-2">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
+              <Egg className="size-5" />
+            </span>
+            <CardTitle className="text-xl">Dylan Chicken Farm</CardTitle>
+          </div>
           <CardDescription>Masuk untuk mengisi laporan harian farm.</CardDescription>
         </CardHeader>
         <CardContent>
