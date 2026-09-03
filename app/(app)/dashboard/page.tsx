@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Egg, Users, TrendingUp, Package, Plus, Sun } from "lucide-react"
 
 import { requireOwnerContext, flockAgeWeeks } from "@/lib/data/app-context"
@@ -85,8 +86,8 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <Card className="border-none bg-primary py-0 text-primary-foreground">
-        <CardContent className="flex items-center gap-4 px-6 py-6">
+      <Card className="flex-row gap-0 overflow-hidden border-none bg-primary py-0 text-primary-foreground">
+        <CardContent className="flex flex-1 items-center gap-4 px-6 py-6">
           <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-primary-foreground/15">
             <Sun className="size-6" />
           </span>
@@ -99,6 +100,17 @@ export default async function DashboardPage() {
             </p>
           </div>
         </CardContent>
+        <div className="relative hidden w-64 shrink-0 sm:block">
+          <Image
+            src="/images/dashboard-hero.jpg"
+            alt="Ayam petelur di kandang"
+            fill
+            sizes="256px"
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-primary/40" />
+        </div>
       </Card>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
