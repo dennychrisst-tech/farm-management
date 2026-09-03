@@ -14,7 +14,7 @@ export default async function UsersSettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Pengguna</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Pengguna</h1>
       <p className="text-sm text-muted-foreground">
         Penambahan akun baru saat ini dilakukan lewat Supabase Dashboard (Authentication → Users),
         lalu tambahkan baris profil dengan role yang sesuai.

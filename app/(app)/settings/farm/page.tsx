@@ -6,7 +6,7 @@ export default async function FarmSettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Data Farm</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Data Farm</h1>
       <FarmSettingsForm farm={farm} />
     </div>
   )

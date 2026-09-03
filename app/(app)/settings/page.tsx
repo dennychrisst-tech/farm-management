@@ -16,7 +16,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Pengaturan</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Pengaturan</h1>
       <div className="space-y-2">
         {links.map((l) => (
           <Link key={l.href} href={l.href}>

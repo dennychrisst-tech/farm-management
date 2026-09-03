@@ -18,7 +18,7 @@ export default async function ThresholdsSettingsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Ambang Batas Alert</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Ambang Batas Alert</h1>
       <p className="text-sm text-muted-foreground">
         Nilai default adalah asumsi awal pilot, bukan standar veteriner. Sesuaikan bersama operator farm.
       </p>

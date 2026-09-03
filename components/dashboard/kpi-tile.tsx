@@ -28,7 +28,7 @@ export function KpiTile({
           <p className="text-sm text-muted-foreground">{label}</p>
           <p
             className={cn(
-              "text-2xl font-semibold tabular-nums",
+              "text-2xl font-bold tracking-tight tabular-nums",
               tone === "warning" && "text-yellow-600 dark:text-yellow-500",
               tone === "danger" && "text-destructive"
             )}

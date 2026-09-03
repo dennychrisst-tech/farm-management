@@ -28,7 +28,7 @@ export default async function ReportsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Riwayat Laporan</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Riwayat Laporan</h1>
       {!reports || reports.length === 0 ? (
         <p className="text-sm text-muted-foreground">Belum ada laporan.</p>
       ) : (

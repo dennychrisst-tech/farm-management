@@ -20,7 +20,7 @@ export default async function InventoryPage() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Inventory Pakan</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Inventory Pakan</h1>
         <Button asChild size="sm">
           <Link href="/inventory/new">
             <Plus className="size-4" /> Transaksi

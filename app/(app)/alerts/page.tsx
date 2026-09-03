@@ -15,7 +15,7 @@ export default async function AlertsPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Alert</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Alert</h1>
       <AlertsClient initialAlerts={alerts ?? []} />
     </div>
   )

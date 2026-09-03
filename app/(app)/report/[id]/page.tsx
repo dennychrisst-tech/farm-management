@@ -42,7 +42,7 @@ export default async function ReportDetailPage({
 
     return (
       <div className="space-y-4">
-        <h1 className="text-lg font-semibold">Laporan Harian — {report.report_date}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Laporan Harian — {report.report_date}</h1>
         <ReportForm
           reportId={report.id}
           farmId={farm.id}
@@ -63,7 +63,7 @@ export default async function ReportDetailPage({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Laporan Harian — {report.report_date}</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Laporan Harian — {report.report_date}</h1>
         <Badge>{STATUS_LABEL[report.status] ?? report.status}</Badge>
       </div>
       <Card>

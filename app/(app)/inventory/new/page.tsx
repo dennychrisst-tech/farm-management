@@ -15,7 +15,7 @@ export default async function NewInventoryTxPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-lg font-semibold">Transaksi Stok Pakan</h1>
+      <h1 className="text-2xl font-bold tracking-tight">Transaksi Stok Pakan</h1>
       <InventoryTxForm farmId={farm.id} feedProducts={feedProducts ?? []} />
     </div>
   )
