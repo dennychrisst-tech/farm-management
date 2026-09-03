@@ -9,8 +9,13 @@ export function generateImageMetadata() {
   ]
 }
 
-export default function Icon({ id }: { id: string }) {
-  const size = id === "512" ? 512 : 192
+// Next's compiled wrapper (next-metadata-route-loader.js) calls this with
+// `id` as its own Promise<string> prop -- separate from `params` -- not
+// nested inside params. Awaiting the wrong thing silently produced the
+// same 192px image for both sizes.
+export default async function Icon({ id }: { id: Promise<string> }) {
+  const resolvedId = await id
+  const size = resolvedId === "512" ? 512 : 192
   return new ImageResponse(
     (
       <div
