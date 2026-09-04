@@ -1,4 +1,5 @@
 import "server-only"
+import { cache } from "react"
 import { redirect } from "next/navigation"
 
 import { createClient } from "@/lib/supabase/server"
@@ -16,8 +17,12 @@ export type AppContext = {
  * farm, and active flock. Redirects to /login if any of that is missing --
  * middleware already guards unauthenticated requests, this covers the edge
  * case of a Supabase Auth user with no matching profile row yet.
+ *
+ * Both the (app) layout and every page under it call this per request --
+ * wrapped in React's cache() so that pair only pays for the underlying
+ * getUser/profile/farm/flock round trips once per request instead of twice.
  */
-export async function getAppContext(): Promise<AppContext> {
+export const getAppContext = cache(async (): Promise<AppContext> => {
   const supabase = await createClient()
 
   const {
@@ -56,7 +61,7 @@ export async function getAppContext(): Promise<AppContext> {
     .maybeSingle()
 
   return { userId: user.id, profile, farm, flock: flock ?? null }
-}
+})
 
 /** Same as getAppContext, but redirects non owner/admin roles to /home. */
 export async function requireOwnerContext(): Promise<AppContext> {
