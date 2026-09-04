@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
-import { Egg } from "lucide-react"
+import Image from "next/image"
 
 import { createClient } from "@/lib/supabase/client"
 import { loginSchema, type LoginInput } from "@/lib/validation/auth"
@@ -62,11 +62,11 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-sm border-white/15 bg-white/90 backdrop-blur-md dark:bg-black/60">
         <CardHeader>
-          <div className="mb-1 flex items-center gap-2">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-              <Egg className="size-5" />
+          <div className="mb-1 flex items-center gap-3">
+            <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
+              <Image src="/images/logo-master.png" alt="Bangun Layer Farm" width={48} height={48} className="size-full object-cover" priority />
             </span>
-            <CardTitle className="text-xl">Dylan Chicken Farm</CardTitle>
+            <CardTitle className="text-xl leading-tight">Bangun Layer Farm</CardTitle>
           </div>
           <CardDescription>Masuk untuk mengisi laporan harian farm.</CardDescription>
         </CardHeader>

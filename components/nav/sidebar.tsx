@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
-import { Egg, LogOut } from "lucide-react"
+import { LogOut } from "lucide-react"
 
 import { navItemsForRole, ownerSidebarExtraItems } from "@/lib/nav-items"
 import { createClient } from "@/lib/supabase/client"
@@ -31,14 +32,11 @@ export function Sidebar({
 
   return (
     <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-sidebar text-sidebar-foreground md:flex">
-      <div className="flex items-center gap-2 px-6 py-6">
-        <span className="flex size-9 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground">
-          <Egg className="size-5" />
+      <div className="flex items-center gap-3 px-6 py-6">
+        <span className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm">
+          <Image src="/images/logo-master.png" alt={farmName} width={40} height={40} className="size-full object-cover" />
         </span>
-        <div className="leading-tight">
-          <p className="text-sm font-semibold">Farm</p>
-          <p className="text-sm font-semibold">Management</p>
-        </div>
+        <p className="text-sm leading-tight font-semibold text-sidebar-foreground">{farmName}</p>
       </div>
 
       <nav className="flex-1 space-y-1 px-3">
@@ -64,7 +62,6 @@ export function Sidebar({
       </nav>
 
       <div className="space-y-2 border-t border-sidebar-border px-3 py-4">
-        <p className="truncate px-3 text-xs text-sidebar-foreground/60">{farmName}</p>
         <button
           onClick={handleSignOut}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground"
