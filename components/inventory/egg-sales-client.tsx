@@ -44,7 +44,7 @@ export function EggSalesClient({
   const [buyerName, setBuyerName] = useState("")
   const [trays, setTrays] = useState("0")
   const [loose, setLoose] = useState("0")
-  const [pricePerEgg, setPricePerEgg] = useState("")
+  const [pricePerTray, setPricePerTray] = useState("45000")
   const [paymentStatus, setPaymentStatus] = useState("unpaid")
   const [amountPaid, setAmountPaid] = useState("0")
 
@@ -60,7 +60,7 @@ export function EggSalesClient({
       buyer_name: buyerName.trim(),
       trays: Number(trays) || 0,
       loose: Number(loose) || 0,
-      price_per_egg: pricePerEgg ? Number(pricePerEgg) : null,
+      price_per_tray: pricePerTray ? Number(pricePerTray) : null,
       payment_status: paymentStatus,
       amount_paid: Number(amountPaid) || 0,
     })
@@ -73,7 +73,6 @@ export function EggSalesClient({
     setBuyerName("")
     setTrays("0")
     setLoose("0")
-    setPricePerEgg("")
     setAmountPaid("0")
     setPaymentStatus("unpaid")
     toast.success("Penjualan dicatat")
@@ -158,10 +157,10 @@ export function EggSalesClient({
           <Input
             type="number"
             min={0}
-            step={0.01}
-            placeholder="Harga per butir (opsional)"
-            value={pricePerEgg}
-            onChange={(e) => setPricePerEgg(e.target.value)}
+            step={500}
+            placeholder="Harga per piring (30 butir)"
+            value={pricePerTray}
+            onChange={(e) => setPricePerTray(e.target.value)}
           />
           <div className="grid grid-cols-2 gap-2">
             <Select value={paymentStatus} onValueChange={setPaymentStatus}>

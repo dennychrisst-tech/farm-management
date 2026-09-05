@@ -7,6 +7,7 @@ export const inventoryTxSchema = z
     feedProductId: z.string().min(1, "Pilih produk pakan"),
     sacks: z.number().min(0, "Tidak boleh negatif"),
     looseKg: z.number().min(0, "Tidak boleh negatif"),
+    unitPrice: z.number().min(0).optional(),
     reason: z.string().optional(),
     reference: z.string().optional(),
   })

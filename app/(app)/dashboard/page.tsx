@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Egg, Users, TrendingUp, Package, Plus, Sun } from "lucide-react"
+import { Egg, Users, TrendingUp, Package, Plus, Sun, Wallet } from "lucide-react"
 
 import { requireOwnerContext, flockAgeWeeks } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
@@ -9,6 +9,7 @@ import { KpiTile } from "@/components/dashboard/kpi-tile"
 import { TrendChart } from "@/components/dashboard/trend-chart"
 import { EggCompositionChart } from "@/components/dashboard/egg-composition-chart"
 import { AlertList } from "@/components/dashboard/alert-list"
+import { SalesProfitCard, type SalesProfitDay } from "@/components/dashboard/sales-profit-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -36,6 +37,9 @@ export default async function DashboardPage() {
   }
 
   const today = todayISO()
+  const rangeStart = new Date()
+  rangeStart.setDate(rangeStart.getDate() - 29)
+  const rangeStartISO = rangeStart.toISOString().slice(0, 10)
 
   const [
     { data: todayKpi },
@@ -75,6 +79,43 @@ export default async function DashboardPage() {
         .maybeSingle(),
       supabase.from("egg_stock_balance").select("*").eq("farm_id", farm.id).maybeSingle(),
     ])
+
+  const [{ data: salesDaily }, { data: feedCostDaily }, { data: supplyCostDaily }] = await Promise.all([
+    supabase
+      .from("sales_daily_summary")
+      .select("sale_date, total_amount")
+      .eq("farm_id", farm.id)
+      .gte("sale_date", rangeStartISO),
+    supabase
+      .from("feed_cost_daily")
+      .select("report_date, feed_cost, has_unpriced")
+      .eq("farm_id", farm.id)
+      .gte("report_date", rangeStartISO),
+    supabase
+      .from("supply_cost_daily")
+      .select("usage_date, supply_cost, has_unpriced")
+      .eq("farm_id", farm.id)
+      .gte("usage_date", rangeStartISO),
+  ])
+
+  const revenueByDate = new Map((salesDaily ?? []).map((d) => [d.sale_date, d.total_amount ?? 0]))
+  const feedCostByDate = new Map((feedCostDaily ?? []).map((d) => [d.report_date, d.feed_cost ?? 0]))
+  const supplyCostByDate = new Map((supplyCostDaily ?? []).map((d) => [d.usage_date, d.supply_cost ?? 0]))
+  const hasUnpricedCost =
+    (feedCostDaily ?? []).some((d) => d.has_unpriced) || (supplyCostDaily ?? []).some((d) => d.has_unpriced)
+
+  const salesProfitData: SalesProfitDay[] = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(rangeStart)
+    d.setDate(d.getDate() + i)
+    const iso = d.toISOString().slice(0, 10)
+    return {
+      date: iso,
+      revenue: revenueByDate.get(iso) ?? 0,
+      feedCost: feedCostByDate.get(iso) ?? 0,
+      supplyCost: supplyCostByDate.get(iso) ?? 0,
+    }
+  })
+  const todayRevenue = revenueByDate.get(today) ?? 0
 
   const minCoverageDays = stock?.length
     ? Math.min(...stock.map((s) => s.coverage_days_actual ?? s.coverage_days_target ?? Infinity))
@@ -144,7 +185,7 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
         <KpiTile
           icon={Egg}
           label="Produksi Telur Hari Ini"
@@ -175,6 +216,12 @@ export default async function DashboardPage() {
           value={`${(eggStockBalance?.eggs_on_hand ?? 0).toLocaleString("id-ID")} butir`}
           sub="belum diambil pembeli"
         />
+        <KpiTile
+          icon={Wallet}
+          label="Pendapatan Hari Ini"
+          value={`Rp ${Math.round(todayRevenue).toLocaleString("id-ID")}`}
+          sub="dari penjualan telur"
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
@@ -204,6 +251,15 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Penjualan &amp; Profit</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <SalesProfitCard data={salesProfitData} hasUnpricedCost={hasUnpricedCost} />
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <Card>

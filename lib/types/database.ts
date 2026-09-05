@@ -417,7 +417,7 @@ export type Database = {
           loose: number
           notes: string | null
           payment_status: string
-          price_per_egg: number | null
+          price_per_tray: number | null
           sale_date: string
           total_amount: number | null
           total_eggs: number | null
@@ -433,7 +433,7 @@ export type Database = {
           loose?: number
           notes?: string | null
           payment_status?: string
-          price_per_egg?: number | null
+          price_per_tray?: number | null
           sale_date?: string
           total_amount?: number | null
           total_eggs?: number | null
@@ -449,7 +449,7 @@ export type Database = {
           loose?: number
           notes?: string | null
           payment_status?: string
-          price_per_egg?: number | null
+          price_per_tray?: number | null
           sale_date?: string
           total_amount?: number | null
           total_eggs?: number | null
@@ -790,6 +790,7 @@ export type Database = {
           reason: string | null
           reference: string | null
           type: string
+          unit_price: number | null
         }
         Insert: {
           created_at?: string
@@ -804,6 +805,7 @@ export type Database = {
           reason?: string | null
           reference?: string | null
           type: string
+          unit_price?: number | null
         }
         Update: {
           created_at?: string
@@ -818,6 +820,7 @@ export type Database = {
           reason?: string | null
           reference?: string | null
           type?: string
+          unit_price?: number | null
         }
         Relationships: [
           {
@@ -1245,6 +1248,7 @@ export type Database = {
           reference: string | null
           supply_item_id: string
           type: string
+          unit_price: number | null
         }
         Insert: {
           created_at?: string
@@ -1257,6 +1261,7 @@ export type Database = {
           reference?: string | null
           supply_item_id: string
           type: string
+          unit_price?: number | null
         }
         Update: {
           created_at?: string
@@ -1269,6 +1274,7 @@ export type Database = {
           reference?: string | null
           supply_item_id?: string
           type?: string
+          unit_price?: number | null
         }
         Relationships: [
           {
@@ -1365,6 +1371,74 @@ export type Database = {
         }
         Relationships: []
       }
+      feed_avg_cost: {
+        Row: {
+          avg_cost_per_kg: number | null
+          farm_id: string | null
+          feed_product_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inventory_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_feed_product_id_fkey"
+            columns: ["feed_product_id"]
+            isOneToOne: false
+            referencedRelation: "feed_products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_feed_product_id_fkey"
+            columns: ["feed_product_id"]
+            isOneToOne: false
+            referencedRelation: "feed_stock_balances"
+            referencedColumns: ["feed_product_id"]
+          },
+          {
+            foreignKeyName: "inventory_transactions_feed_product_id_fkey"
+            columns: ["feed_product_id"]
+            isOneToOne: false
+            referencedRelation: "feed_stock_coverage"
+            referencedColumns: ["feed_product_id"]
+          },
+        ]
+      }
+      feed_cost_daily: {
+        Row: {
+          farm_id: string | null
+          feed_cost: number | null
+          has_unpriced: boolean | null
+          report_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_reports_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "daily_reports_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       feed_stock_balances: {
         Row: {
           balance_kg: number | null
@@ -1425,6 +1499,71 @@ export type Database = {
           },
         ]
       }
+      sales_daily_summary: {
+        Row: {
+          amount_paid: number | null
+          farm_id: string | null
+          loose: number | null
+          sale_date: string | null
+          total_amount: number | null
+          total_eggs: number | null
+          trays: number | null
+          tx_count: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "egg_sales_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "egg_sales_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supply_avg_cost: {
+        Row: {
+          avg_cost_per_unit: number | null
+          farm_id: string | null
+          supply_item_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supply_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_supply_item_id_fkey"
+            columns: ["supply_item_id"]
+            isOneToOne: false
+            referencedRelation: "supply_balances"
+            referencedColumns: ["supply_item_id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_supply_item_id_fkey"
+            columns: ["supply_item_id"]
+            isOneToOne: false
+            referencedRelation: "supply_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supply_balances: {
         Row: {
           balance: number | null
@@ -1445,6 +1584,30 @@ export type Database = {
           },
           {
             foreignKeyName: "supply_items_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supply_cost_daily: {
+        Row: {
+          farm_id: string | null
+          has_unpriced: boolean | null
+          supply_cost: number | null
+          usage_date: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supply_transactions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "supply_transactions_farm_id_fkey"
             columns: ["farm_id"]
             isOneToOne: false
             referencedRelation: "farms"

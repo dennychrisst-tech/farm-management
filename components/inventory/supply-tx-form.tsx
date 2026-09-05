@@ -46,6 +46,7 @@ export function SupplyTxForm({
       direction: "add",
       supplyItemId: items[0]?.id ?? "",
       qty: 0,
+      unitPrice: undefined,
       reason: "",
       reference: "",
     },
@@ -71,6 +72,7 @@ export function SupplyTxForm({
       supply_item_id: values.supplyItemId,
       type: values.type,
       qty: sign * values.qty,
+      unit_price: values.type === "IN" ? values.unitPrice || null : null,
       reason: values.reason || null,
       reference: values.reference || null,
     })
@@ -181,6 +183,33 @@ export function SupplyTxForm({
             </FormItem>
           )}
         />
+
+        {type === "IN" && (
+          <FormField
+            control={form.control}
+            name="unitPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Harga per {selectedItem?.unit ?? "unit"} (opsional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step={1}
+                    placeholder="mis. 15000"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Dipakai untuk estimasi biaya obat/suplemen di laporan penjualan &amp; profit.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

@@ -47,6 +47,7 @@ export function InventoryTxForm({
       feedProductId: feedProducts[0]?.id ?? "",
       sacks: 0,
       looseKg: 0,
+      unitPrice: undefined,
       reason: "",
       reference: "",
     },
@@ -69,6 +70,7 @@ export function InventoryTxForm({
       type: values.type,
       qty_sacks: sign * values.sacks,
       qty_kg: sign * magnitudeKg,
+      unit_price: values.type === "IN" ? values.unitPrice || null : null,
       reason: values.reason || null,
       reference: values.reference || null,
     })
@@ -205,6 +207,33 @@ export function InventoryTxForm({
             )}
           />
         </div>
+
+        {type === "IN" && (
+          <FormField
+            control={form.control}
+            name="unitPrice"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Harga per kg (opsional)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step={1}
+                    placeholder="mis. 8500"
+                    value={field.value ?? ""}
+                    onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                  />
+                </FormControl>
+                <p className="text-xs text-muted-foreground">
+                  Dipakai untuk estimasi biaya pakan di laporan penjualan &amp; profit.
+                </p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
 
         <FormField
           control={form.control}

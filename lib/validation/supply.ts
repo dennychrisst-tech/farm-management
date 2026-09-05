@@ -6,6 +6,7 @@ export const supplyTxSchema = z
     direction: z.enum(["add", "subtract"]),
     supplyItemId: z.string().min(1, "Pilih item"),
     qty: z.number().min(0.01, "Jumlah harus lebih dari 0"),
+    unitPrice: z.number().min(0).optional(),
     reason: z.string().optional(),
     reference: z.string().optional(),
   })
