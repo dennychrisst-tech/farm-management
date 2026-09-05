@@ -135,9 +135,22 @@
     z-index: -1;
     pointer-events: none;
     background-image:
-      radial-gradient(circle at 6% 4%, var(--farm-blob-1) 0%, var(--farm-blob-1) 28%, transparent 60%),
-      radial-gradient(circle at 97% 96%, var(--farm-blob-2) 0%, var(--farm-blob-2) 28%, transparent 60%);
+      radial-gradient(circle at 6% 4%, var(--farm-blob-1) 0%, var(--farm-blob-1) 28%, transparent 60%);
     filter: blur(28px);
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("/images/dashboard-hero.jpg");
+    background-repeat: no-repeat;
+    background-position: bottom right;
+    background-size: min(640px, 55vw) auto;
+    -webkit-mask-image: radial-gradient(circle at bottom right, black 0%, black 20%, transparent 62%);
+    mask-image: radial-gradient(circle at bottom right, black 0%, black 20%, transparent 62%);
+    opacity: 0.5;
   }
   html {
     @apply font-sans;
