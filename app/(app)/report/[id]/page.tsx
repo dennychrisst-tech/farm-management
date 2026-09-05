@@ -2,6 +2,7 @@ import { notFound } from "next/navigation"
 
 import { getAppContext } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
+import { calcEggGrade } from "@/lib/kpi"
 import { ReportForm } from "@/components/report/report-form"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -60,6 +61,17 @@ export default async function ReportDetailPage({
     .eq("daily_report_id", report.id)
     .maybeSingle()
 
+  const { data: eggProduction } = await supabase
+    .from("egg_production")
+    .select("*")
+    .eq("daily_report_id", report.id)
+    .maybeSingle()
+
+  const avgWeightGrams =
+    eggProduction?.egg_weight_kg && eggProduction.total_eggs
+      ? (Number(eggProduction.egg_weight_kg) * 1000) / eggProduction.total_eggs
+      : 0
+
   const { data: evidence } = await supabase
     .from("evidence")
     .select("*")
@@ -96,6 +108,39 @@ export default async function ReportDetailPage({
           {report.notes && <Row label="Catatan" value={report.notes} />}
         </CardContent>
       </Card>
+
+      {eggProduction && (
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Kualitas Telur</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2 text-sm">
+            <Row label="Telur normal" value={`${eggProduction.normal_eggs ?? 0} butir`} />
+            <Row label="Telur cacat" value={`${eggProduction.abnormal_eggs ?? 0} butir`} />
+            {(eggProduction.abnormal_eggs ?? 0) > 0 && (
+              <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                {[
+                  ["Pecah", eggProduction.defect_cracked],
+                  ["Kotor", eggProduction.defect_dirty],
+                  ["Kerabang tipis", eggProduction.defect_thin_shell],
+                  ["Double yolk", eggProduction.defect_double_yolk],
+                  ["Ukuran kecil", eggProduction.defect_undersized],
+                  ["Lainnya", eggProduction.defect_other],
+                ]
+                  .filter(([, n]) => (n as number) > 0)
+                  .map(([label, n]) => `${label}: ${n}`)
+                  .join(" · ")}
+              </div>
+            )}
+            {avgWeightGrams > 0 && (
+              <Row
+                label="Grade ukuran"
+                value={`${calcEggGrade(avgWeightGrams)} (${avgWeightGrams.toFixed(1)} g/butir)`}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {evidenceWithUrls.length > 0 && (
         <Card>

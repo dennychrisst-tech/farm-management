@@ -4,6 +4,7 @@ import { Egg, Users, TrendingUp, Package, Plus, Sun } from "lucide-react"
 
 import { requireOwnerContext, flockAgeWeeks } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
+import { calcEggGrade } from "@/lib/kpi"
 import { KpiTile } from "@/components/dashboard/kpi-tile"
 import { TrendChart } from "@/components/dashboard/trend-chart"
 import { EggCompositionChart } from "@/components/dashboard/egg-composition-chart"
@@ -36,8 +37,15 @@ export default async function DashboardPage() {
 
   const today = todayISO()
 
-  const [{ data: todayKpi }, { data: trend }, { data: stock }, { data: reachedMilestones }, { data: alerts }] =
-    await Promise.all([
+  const [
+    { data: todayKpi },
+    { data: trend },
+    { data: stock },
+    { data: reachedMilestones },
+    { data: alerts },
+    { data: todayEgg },
+    { data: eggStockBalance },
+  ] = await Promise.all([
       supabase
         .from("daily_report_kpis")
         .select("*")
@@ -59,6 +67,13 @@ export default async function DashboardPage() {
         .eq("status", "open")
         .order("created_at", { ascending: false })
         .limit(5),
+      supabase
+        .from("egg_production")
+        .select("*, daily_reports!inner(flock_id, report_date)")
+        .eq("daily_reports.flock_id", flock.id)
+        .eq("daily_reports.report_date", today)
+        .maybeSingle(),
+      supabase.from("egg_stock_balance").select("*").eq("farm_id", farm.id).maybeSingle(),
     ])
 
   const minCoverageDays = stock?.length
@@ -66,6 +81,22 @@ export default async function DashboardPage() {
     : null
 
   const reachedSet = new Set((reachedMilestones ?? []).map((m) => m.milestone_pct))
+
+  const avgEggWeightGrams =
+    todayEgg?.egg_weight_kg && todayEgg.total_eggs
+      ? (Number(todayEgg.egg_weight_kg) * 1000) / todayEgg.total_eggs
+      : 0
+
+  const defectBreakdown = todayEgg
+    ? [
+        { label: "Pecah", value: todayEgg.defect_cracked },
+        { label: "Kotor", value: todayEgg.defect_dirty },
+        { label: "Kerabang tipis", value: todayEgg.defect_thin_shell },
+        { label: "Double yolk", value: todayEgg.defect_double_yolk },
+        { label: "Kecil", value: todayEgg.defect_undersized },
+        { label: "Lainnya", value: todayEgg.defect_other },
+      ]
+    : []
 
   return (
     <div className="space-y-5">
@@ -113,11 +144,12 @@ export default async function DashboardPage() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         <KpiTile
           icon={Egg}
           label="Produksi Telur Hari Ini"
           value={`${(todayKpi?.total_eggs ?? 0).toLocaleString("id-ID")} butir`}
+          sub={avgEggWeightGrams > 0 ? calcEggGrade(avgEggWeightGrams) : undefined}
         />
         <KpiTile
           icon={Users}
@@ -136,6 +168,12 @@ export default async function DashboardPage() {
           }
           sub="estimasi coverage"
           tone={minCoverageDays !== null && minCoverageDays < 10 ? "danger" : "default"}
+        />
+        <KpiTile
+          icon={Egg}
+          label="Stok Telur di Farm"
+          value={`${(eggStockBalance?.eggs_on_hand ?? 0).toLocaleString("id-ID")} butir`}
+          sub="belum diambil pembeli"
         />
       </div>
 
@@ -161,6 +199,7 @@ export default async function DashboardPage() {
             <EggCompositionChart
               normalEggs={todayKpi?.normal_eggs ?? 0}
               abnormalEggs={todayKpi?.abnormal_eggs ?? 0}
+              defects={defectBreakdown}
             />
           </CardContent>
         </Card>

@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, type Control } from "react-hook-form"
 import { toast } from "sonner"
 import { ArrowLeft } from "lucide-react"
 
@@ -67,8 +67,12 @@ export function ReportForm({
       eveningLooseKg: 0,
       normalTrays: 0,
       normalLoose: 0,
-      abnormalTrays: 0,
-      abnormalLoose: 0,
+      defectCracked: 0,
+      defectDirty: 0,
+      defectThinShell: 0,
+      defectDoubleYolk: 0,
+      defectUndersized: 0,
+      defectOther: 0,
       notes: "",
     },
   })
@@ -76,7 +80,13 @@ export function ReportForm({
   const values = form.watch()
 
   const totalNormal = calcEggs(values.normalTrays || 0, values.normalLoose || 0, traySize)
-  const totalAbnormal = calcEggs(values.abnormalTrays || 0, values.abnormalLoose || 0, traySize)
+  const totalAbnormal =
+    (values.defectCracked || 0) +
+    (values.defectDirty || 0) +
+    (values.defectThinShell || 0) +
+    (values.defectDoubleYolk || 0) +
+    (values.defectUndersized || 0) +
+    (values.defectOther || 0)
   const totalEggs = totalNormal + totalAbnormal
   const hdpPct = calcHdpPct(totalEggs, liveBirds)
 
@@ -112,8 +122,12 @@ export function ReportForm({
             daily_report_id: reportId,
             normal_trays: v.normalTrays,
             normal_loose: v.normalLoose,
-            abnormal_trays: v.abnormalTrays,
-            abnormal_loose: v.abnormalLoose,
+            defect_cracked: v.defectCracked,
+            defect_dirty: v.defectDirty,
+            defect_thin_shell: v.defectThinShell,
+            defect_double_yolk: v.defectDoubleYolk,
+            defect_undersized: v.defectUndersized,
+            defect_other: v.defectOther,
             egg_weight_kg: v.eggWeightKg ?? null,
           },
           { onConflict: "daily_report_id" }
@@ -216,7 +230,22 @@ export function ReportForm({
             <Row label="Total pakan" value={`${(morningKg + eveningKg).toFixed(1)} kg`} strong />
             <Separator />
             <Row label="Telur normal" value={`${totalNormal} butir`} />
-            <Row label="Telur abnormal" value={`${totalAbnormal} butir`} />
+            <Row label="Telur cacat" value={`${totalAbnormal} butir`} />
+            {totalAbnormal > 0 && (
+              <div className="rounded-md bg-muted/50 px-3 py-2 text-xs text-muted-foreground">
+                {[
+                  ["Pecah", values.defectCracked],
+                  ["Kotor", values.defectDirty],
+                  ["Kerabang tipis", values.defectThinShell],
+                  ["Double yolk", values.defectDoubleYolk],
+                  ["Ukuran kecil", values.defectUndersized],
+                  ["Lainnya", values.defectOther],
+                ]
+                  .filter(([, n]) => (n as number) > 0)
+                  .map(([label, n]) => `${label}: ${n}`)
+                  .join(" · ")}
+              </div>
+            )}
             <Row label="Total telur" value={`${totalEggs} butir`} strong />
             <Row label="Perkiraan HDP" value={`${hdpPct.toFixed(2)}%`} strong />
             <Separator />
@@ -510,49 +539,15 @@ export function ReportForm({
 
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium">Telur Abnormal</CardTitle>
+            <CardTitle className="text-sm font-medium">Telur Cacat (per jenis)</CardTitle>
           </CardHeader>
           <CardContent className="grid grid-cols-2 gap-3">
-            <FormField
-              control={form.control}
-              name="abnormalTrays"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Piring (30 butir)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      {...field}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="abnormalLoose"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Butir lepas</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      {...field}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <DefectField control={form.control} name="defectCracked" label="Pecah" />
+            <DefectField control={form.control} name="defectDirty" label="Kotor" />
+            <DefectField control={form.control} name="defectThinShell" label="Kerabang tipis" />
+            <DefectField control={form.control} name="defectDoubleYolk" label="Double yolk" />
+            <DefectField control={form.control} name="defectUndersized" label="Ukuran kecil" />
+            <DefectField control={form.control} name="defectOther" label="Lainnya" />
             <div className="col-span-2">
               <FormField
                 control={form.control}
@@ -606,6 +601,47 @@ export function ReportForm({
         </Button>
       </form>
     </Form>
+  )
+}
+
+type DefectFieldName =
+  | "defectCracked"
+  | "defectDirty"
+  | "defectThinShell"
+  | "defectDoubleYolk"
+  | "defectUndersized"
+  | "defectOther"
+
+function DefectField({
+  control,
+  name,
+  label,
+}: {
+  control: Control<DailyReportInput>
+  name: DefectFieldName
+  label: string
+}) {
+  return (
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Input
+              type="number"
+              inputMode="numeric"
+              min={0}
+              {...field}
+              value={field.value}
+              onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
+      )}
+    />
   )
 }
 

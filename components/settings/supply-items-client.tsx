@@ -40,6 +40,7 @@ export function SupplyItemsClient({
   const [newName, setNewName] = useState("")
   const [newCategory, setNewCategory] = useState("medicine")
   const [newUnit, setNewUnit] = useState("unit")
+  const [newMinStock, setNewMinStock] = useState("0")
 
   async function toggleActive(item: SupplyItem) {
     const supabase = createClient()
@@ -54,6 +55,21 @@ export function SupplyItemsClient({
     router.refresh()
   }
 
+  async function updateMinStock(item: SupplyItem, value: string) {
+    const qty = Number(value) || 0
+    if (qty === Number(item.min_stock_qty)) return
+    const supabase = createClient()
+    const { error } = await supabase
+      .from("supply_items")
+      .update({ min_stock_qty: qty })
+      .eq("id", item.id)
+    if (error) {
+      toast.error("Gagal memperbarui stok minimum", { description: error.message })
+      return
+    }
+    router.refresh()
+  }
+
   async function addItem() {
     if (!newName.trim()) return
     setAdding(true)
@@ -63,6 +79,7 @@ export function SupplyItemsClient({
       name: newName.trim(),
       category: newCategory,
       unit: newUnit.trim() || "unit",
+      min_stock_qty: Number(newMinStock) || 0,
     })
     setAdding(false)
 
@@ -81,13 +98,26 @@ export function SupplyItemsClient({
         {initialItems.map((item) => (
           <Card key={item.id}>
             <CardContent className="flex items-center justify-between py-3">
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium">{item.name}</p>
                 <p className="text-xs text-muted-foreground capitalize">
                   {item.category} · {item.unit}
                 </p>
               </div>
-              <Switch checked={item.active} onCheckedChange={() => toggleActive(item)} />
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs text-muted-foreground">Min</span>
+                  <Input
+                    type="number"
+                    min={0}
+                    step={0.1}
+                    defaultValue={item.min_stock_qty}
+                    onBlur={(e) => updateMinStock(item, e.target.value)}
+                    className="h-8 w-20"
+                  />
+                </div>
+                <Switch checked={item.active} onCheckedChange={() => toggleActive(item)} />
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -115,6 +145,14 @@ export function SupplyItemsClient({
             </Select>
             <Input placeholder="Satuan (mis. botol)" value={newUnit} onChange={(e) => setNewUnit(e.target.value)} />
           </div>
+          <Input
+            type="number"
+            min={0}
+            step={0.1}
+            placeholder="Stok minimum (alert jika di bawah ini)"
+            value={newMinStock}
+            onChange={(e) => setNewMinStock(e.target.value)}
+          />
           <Button size="sm" onClick={addItem} disabled={adding} className="w-full">
             <Plus className="size-4" /> Tambah
           </Button>

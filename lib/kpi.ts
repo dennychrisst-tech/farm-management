@@ -25,3 +25,12 @@ export function calcFeedIntakeGPerBird(actualFeedKg: number, liveBirds: number):
   if (!liveBirds) return 0
   return (actualFeedKg * 1000) / liveBirds
 }
+
+/** Grades average egg weight (grams/egg) into the size buckets buyers price by. */
+export function calcEggGrade(avgWeightGrams: number): string {
+  if (avgWeightGrams <= 0) return "-"
+  if (avgWeightGrams < 50) return "Kecil (S)"
+  if (avgWeightGrams < 60) return "Sedang (M)"
+  if (avgWeightGrams < 70) return "Besar (L)"
+  return "Jumbo (XL)"
+}

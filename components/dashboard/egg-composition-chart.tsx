@@ -12,9 +12,11 @@ const chartConfig = {
 export function EggCompositionChart({
   normalEggs,
   abnormalEggs,
+  defects,
 }: {
   normalEggs: number
   abnormalEggs: number
+  defects?: { label: string; value: number }[]
 }) {
   const total = normalEggs + abnormalEggs
   const data = [
@@ -26,7 +28,10 @@ export function EggCompositionChart({
     return <p className="py-10 text-center text-sm text-muted-foreground">Belum ada data hari ini.</p>
   }
 
+  const activeDefects = (defects ?? []).filter((d) => d.value > 0)
+
   return (
+    <div className="space-y-3">
     <div className="flex items-center gap-6">
       <ChartContainer config={chartConfig} className="aspect-square h-40 w-40 shrink-0">
         <PieChart>
@@ -61,6 +66,16 @@ export function EggCompositionChart({
           </div>
         ))}
       </div>
+    </div>
+      {activeDefects.length > 0 && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 border-t pt-2 text-xs text-muted-foreground">
+          {activeDefects.map((d) => (
+            <span key={d.label}>
+              {d.label}: <span className="font-medium text-foreground">{d.value}</span>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

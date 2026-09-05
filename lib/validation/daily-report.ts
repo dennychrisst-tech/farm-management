@@ -15,8 +15,12 @@ export const dailyReportSchema = z.object({
 
   normalTrays: z.number().int().min(0, "Tidak boleh negatif"),
   normalLoose: z.number().int().min(0, "Tidak boleh negatif"),
-  abnormalTrays: z.number().int().min(0, "Tidak boleh negatif"),
-  abnormalLoose: z.number().int().min(0, "Tidak boleh negatif"),
+  defectCracked: z.number().int().min(0, "Tidak boleh negatif"),
+  defectDirty: z.number().int().min(0, "Tidak boleh negatif"),
+  defectThinShell: z.number().int().min(0, "Tidak boleh negatif"),
+  defectDoubleYolk: z.number().int().min(0, "Tidak boleh negatif"),
+  defectUndersized: z.number().int().min(0, "Tidak boleh negatif"),
+  defectOther: z.number().int().min(0, "Tidak boleh negatif"),
   eggWeightKg: z.number().min(0).optional(),
 
   notes: z.string().max(2000).optional(),

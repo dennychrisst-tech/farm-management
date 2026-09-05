@@ -29,7 +29,12 @@ export function SupplyList({ items }: { items: Tables<"supply_balances">[] }) {
             <CardContent className="space-y-1 py-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-medium">{s.name}</p>
-                <Badge variant="outline">{CATEGORY_LABEL[s.category ?? "other"] ?? s.category}</Badge>
+                <div className="flex items-center gap-1.5">
+                  {(s.min_stock_qty ?? 0) > 0 && (s.balance ?? 0) <= (s.min_stock_qty ?? 0) && (
+                    <Badge variant="destructive">Stok rendah</Badge>
+                  )}
+                  <Badge variant="outline">{CATEGORY_LABEL[s.category ?? "other"] ?? s.category}</Badge>
+                </div>
               </div>
               <p className="text-sm text-muted-foreground">
                 {(s.balance ?? 0).toFixed(1)} {s.unit}
