@@ -4,6 +4,7 @@ import "./globals.css";
 import { SerwistProvider } from "@serwist/next/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { AppPreloader } from "@/components/app-preloader";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <AppPreloader />
         <SerwistProvider swUrl="/sw.js" register cacheOnNavigation reloadOnOnline>
           <ThemeProvider
             attribute="class"
