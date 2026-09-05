@@ -5,6 +5,7 @@ import {
   Package,
   Bell,
   Settings,
+  HeartPulse,
   type LucideIcon,
 } from "lucide-react"
 
@@ -27,6 +28,7 @@ export const ownerNavItems: NavItem[] = [
 ]
 
 export const ownerSidebarExtraItems: NavItem[] = [
+  { href: "/monitoring", label: "Monitoring", icon: HeartPulse },
   { href: "/settings", label: "Pengaturan", icon: Settings },
 ]
 

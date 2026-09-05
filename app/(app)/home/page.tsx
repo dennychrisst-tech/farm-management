@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { DailyChecklist, type ChecklistItem } from "@/components/home/daily-checklist"
 
 const STATUS_LABEL: Record<string, { label: string; variant: "outline" | "secondary" | "default" }> = {
   draft: { label: "Draft", variant: "secondary" },
@@ -25,7 +26,13 @@ export default async function HomePage() {
   const sevenDaysAgo = new Date()
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
 
-  const [{ data: todayReport }, { data: recentReports }, { data: target }] = flock
+  const [
+    { data: todayReport },
+    { data: recentReports },
+    { data: target },
+    { data: checklistItems },
+    { data: completions },
+  ] = flock
     ? await Promise.all([
         supabase
           .from("daily_reports")
@@ -44,8 +51,26 @@ export default async function HomePage() {
           .eq("flock_id", flock.id)
           .eq("day_number", flockAgeDays(flock))
           .maybeSingle(),
+        supabase
+          .from("daily_checklist_items")
+          .select("id, label")
+          .eq("farm_id", farm.id)
+          .eq("active", true)
+          .order("sort_order"),
+        supabase
+          .from("daily_checklist_completions")
+          .select("item_id")
+          .eq("farm_id", farm.id)
+          .eq("completion_date", today),
       ])
-    : [{ data: null }, { data: [] }, { data: null }]
+    : [{ data: null }, { data: [] }, { data: null }, { data: [] }, { data: [] }]
+
+  const doneItemIds = new Set((completions ?? []).map((c) => c.item_id))
+  const checklist: ChecklistItem[] = (checklistItems ?? []).map((item) => ({
+    id: item.id,
+    label: item.label,
+    done: doneItemIds.has(item.id),
+  }))
 
   const completedCount = (recentReports ?? []).filter(
     (r) => r.status === "submitted" || r.status === "verified"
@@ -120,6 +145,15 @@ export default async function HomePage() {
           <ChevronRight className="size-5" />
         </Link>
       </Button>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-sm font-medium">Checklist Harian</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <DailyChecklist farmId={farm.id} items={checklist} todayISO={today} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader className="pb-2">

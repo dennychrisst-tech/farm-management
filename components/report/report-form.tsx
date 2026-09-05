@@ -59,6 +59,7 @@ export function ReportForm({
       mortality: 0,
       mortalityNote: "",
       cull: 0,
+      waterLiters: undefined,
       morningFeedProductId: feedProducts[0]?.id ?? "",
       morningSacks: 0,
       morningLooseKg: 0,
@@ -159,6 +160,7 @@ export function ReportForm({
           mortality: v.mortality,
           mortality_note: v.mortalityNote || null,
           cull: v.cull,
+          water_liters: v.waterLiters ?? null,
           notes: v.notes || null,
         })
         .eq("id", reportId)
@@ -213,6 +215,9 @@ export function ReportForm({
             <Row label="Mortalitas" value={`${values.mortality} ekor`} />
             {values.mortalityNote && <Row label="Sebab kematian" value={values.mortalityNote} />}
             <Row label="Afkir (cull)" value={`${values.cull} ekor`} />
+            {values.waterLiters !== undefined && (
+              <Row label="Konsumsi air" value={`${values.waterLiters} liter`} />
+            )}
             <Row
               label="Populasi akhir"
               value={`${closingPopulation.toLocaleString("id-ID")} ekor`}
@@ -334,6 +339,30 @@ export function ReportForm({
                 )}
               />
             )}
+            <FormField
+              control={form.control}
+              name="waterLiters"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Konsumsi Air (liter, opsional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      inputMode="decimal"
+                      min={0}
+                      step={1}
+                      placeholder="mis. 450"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(e.target.valueAsNumber || undefined)}
+                    />
+                  </FormControl>
+                  <p className="text-xs text-muted-foreground">
+                    Penurunan air minum sering jadi tanda awal masalah kesehatan/produksi.
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </CardContent>
         </Card>
 

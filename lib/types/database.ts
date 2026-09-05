@@ -27,6 +27,7 @@ export type Database = {
           production_decline_days: number
           updated_at: string
           updated_by: string | null
+          water_drop_alert_pct: number
         }
         Insert: {
           farm_id: string
@@ -40,6 +41,7 @@ export type Database = {
           production_decline_days?: number
           updated_at?: string
           updated_by?: string | null
+          water_drop_alert_pct?: number
         }
         Update: {
           farm_id?: string
@@ -53,6 +55,7 @@ export type Database = {
           production_decline_days?: number
           updated_at?: string
           updated_by?: string | null
+          water_drop_alert_pct?: number
         }
         Relationships: [
           {
@@ -183,6 +186,233 @@ export type Database = {
           },
         ]
       }
+      biosecurity_log: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          foot_dip_used: boolean
+          id: string
+          notes: string | null
+          purpose: string | null
+          vehicle_disinfected: boolean
+          visit_date: string
+          visitor_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          foot_dip_used?: boolean
+          id?: string
+          notes?: string | null
+          purpose?: string | null
+          vehicle_disinfected?: boolean
+          visit_date?: string
+          visitor_name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          foot_dip_used?: boolean
+          id?: string
+          notes?: string | null
+          purpose?: string | null
+          vehicle_disinfected?: boolean
+          visit_date?: string
+          visitor_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "biosecurity_log_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "biosecurity_log_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "biosecurity_log_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      body_weight_samples: {
+        Row: {
+          age_days: number
+          avg_weight_grams: number
+          created_at: string
+          created_by: string | null
+          farm_id: string
+          flock_id: string
+          id: string
+          notes: string | null
+          sample_count: number
+          sample_date: string
+        }
+        Insert: {
+          age_days: number
+          avg_weight_grams: number
+          created_at?: string
+          created_by?: string | null
+          farm_id: string
+          flock_id: string
+          id?: string
+          notes?: string | null
+          sample_count: number
+          sample_date?: string
+        }
+        Update: {
+          age_days?: number
+          avg_weight_grams?: number
+          created_at?: string
+          created_by?: string | null
+          farm_id?: string
+          flock_id?: string
+          id?: string
+          notes?: string | null
+          sample_count?: number
+          sample_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "body_weight_samples_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "body_weight_samples_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "body_weight_samples_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "body_weight_samples_flock_id_fkey"
+            columns: ["flock_id"]
+            isOneToOne: false
+            referencedRelation: "flocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_checklist_completions: {
+        Row: {
+          completed_at: string
+          completed_by: string | null
+          completion_date: string
+          farm_id: string
+          id: string
+          item_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completed_by?: string | null
+          completion_date?: string
+          farm_id: string
+          id?: string
+          item_id: string
+        }
+        Update: {
+          completed_at?: string
+          completed_by?: string | null
+          completion_date?: string
+          farm_id?: string
+          id?: string
+          item_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_checklist_completions_completed_by_fkey"
+            columns: ["completed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_checklist_completions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "daily_checklist_completions_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_checklist_completions_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "daily_checklist_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      daily_checklist_items: {
+        Row: {
+          active: boolean
+          created_at: string
+          farm_id: string
+          id: string
+          label: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          farm_id: string
+          id?: string
+          label: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          farm_id?: string
+          id?: string
+          label?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_checklist_items_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "daily_checklist_items_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       daily_report_revisions: {
         Row: {
           change_reason: string | null
@@ -255,6 +485,7 @@ export type Database = {
           updated_at: string
           verified_at: string | null
           verified_by: string | null
+          water_liters: number | null
         }
         Insert: {
           closing_population?: number | null
@@ -275,6 +506,7 @@ export type Database = {
           updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
+          water_liters?: number | null
         }
         Update: {
           closing_population?: number | null
@@ -295,6 +527,7 @@ export type Database = {
           updated_at?: string
           verified_at?: string | null
           verified_by?: string | null
+          water_liters?: number | null
         }
         Relationships: [
           {
@@ -691,9 +924,11 @@ export type Database = {
           flock_id: string
           id: string
           light_schedule: string | null
+          target_body_weight_g: number | null
           target_feed_evening_kg: number | null
           target_feed_kg_per_day: number | null
           target_feed_morning_kg: number | null
+          target_hdp_pct: number | null
         }
         Insert: {
           created_at?: string
@@ -701,9 +936,11 @@ export type Database = {
           flock_id: string
           id?: string
           light_schedule?: string | null
+          target_body_weight_g?: number | null
           target_feed_evening_kg?: number | null
           target_feed_kg_per_day?: number | null
           target_feed_morning_kg?: number | null
+          target_hdp_pct?: number | null
         }
         Update: {
           created_at?: string
@@ -711,9 +948,11 @@ export type Database = {
           flock_id?: string
           id?: string
           light_schedule?: string | null
+          target_body_weight_g?: number | null
           target_feed_evening_kg?: number | null
           target_feed_kg_per_day?: number | null
           target_feed_morning_kg?: number | null
+          target_hdp_pct?: number | null
         }
         Relationships: [
           {
@@ -1314,6 +1553,136 @@ export type Database = {
           },
         ]
       }
+      vaccination_plan: {
+        Row: {
+          created_at: string
+          day_number: number
+          farm_id: string
+          flock_id: string
+          id: string
+          method: string | null
+          notes: string | null
+          vaccine_name: string
+        }
+        Insert: {
+          created_at?: string
+          day_number: number
+          farm_id: string
+          flock_id: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          vaccine_name: string
+        }
+        Update: {
+          created_at?: string
+          day_number?: number
+          farm_id?: string
+          flock_id?: string
+          id?: string
+          method?: string | null
+          notes?: string | null
+          vaccine_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccination_plan_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "vaccination_plan_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_plan_flock_id_fkey"
+            columns: ["flock_id"]
+            isOneToOne: false
+            referencedRelation: "flocks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vaccination_records: {
+        Row: {
+          administered_by: string | null
+          administered_date: string
+          batch_no: string | null
+          created_at: string
+          farm_id: string
+          flock_id: string
+          id: string
+          notes: string | null
+          plan_id: string | null
+          vaccine_name: string
+        }
+        Insert: {
+          administered_by?: string | null
+          administered_date?: string
+          batch_no?: string | null
+          created_at?: string
+          farm_id: string
+          flock_id: string
+          id?: string
+          notes?: string | null
+          plan_id?: string | null
+          vaccine_name: string
+        }
+        Update: {
+          administered_by?: string | null
+          administered_date?: string
+          batch_no?: string | null
+          created_at?: string
+          farm_id?: string
+          flock_id?: string
+          id?: string
+          notes?: string | null
+          plan_id?: string | null
+          vaccine_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vaccination_records_administered_by_fkey"
+            columns: ["administered_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_records_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "egg_stock_balance"
+            referencedColumns: ["farm_id"]
+          },
+          {
+            foreignKeyName: "vaccination_records_farm_id_fkey"
+            columns: ["farm_id"]
+            isOneToOne: false
+            referencedRelation: "farms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_records_flock_id_fkey"
+            columns: ["flock_id"]
+            isOneToOne: false
+            referencedRelation: "flocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vaccination_records_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "vaccination_plan"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       daily_report_kpis: {
@@ -1325,6 +1694,7 @@ export type Database = {
           cull: number | null
           daily_report_id: string | null
           farm_id: string | null
+          fcr: number | null
           feed_intake_g_per_bird: number | null
           feed_target_kg: number | null
           feed_target_sacks: number | null
@@ -1685,6 +2055,11 @@ export type Database = {
       }
       evaluate_production_decline_alert: {
         Args: { p_flock_id: string; p_report_id: string }
+        Returns: undefined
+      }
+      evaluate_vaccination_due_alerts: { Args: never; Returns: undefined }
+      evaluate_water_intake_alert: {
+        Args: { p_report_id: string }
         Returns: undefined
       }
       finalize_daily_report: {

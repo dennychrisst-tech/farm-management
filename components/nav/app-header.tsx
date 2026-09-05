@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-import { LogOut, Settings } from "lucide-react"
+import { LogOut, Settings, HeartPulse } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -37,11 +37,18 @@ export function AppHeader({
       </div>
       <div className="flex items-center gap-1">
         {(role === "owner" || role === "admin") && (
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="/settings/farm" aria-label="Pengaturan">
-              <Settings className="size-4" />
-            </Link>
-          </Button>
+          <>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/monitoring" aria-label="Monitoring">
+                <HeartPulse className="size-4" />
+              </Link>
+            </Button>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/settings/farm" aria-label="Pengaturan">
+                <Settings className="size-4" />
+              </Link>
+            </Button>
+          </>
         )}
         <Button variant="ghost" size="icon" onClick={handleSignOut} aria-label="Keluar">
           <LogOut className="size-4" />

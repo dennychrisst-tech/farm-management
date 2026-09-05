@@ -20,7 +20,7 @@ export default async function ReportDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const { farm } = await getAppContext()
+  const { farm, flock } = await getAppContext()
   const supabase = await createClient()
 
   const { data: report } = await supabase
@@ -55,10 +55,26 @@ export default async function ReportDetailPage({
     )
   }
 
-  const [{ data: kpi }, { data: eggProduction }, { data: evidence }] = await Promise.all([
+  const reportAgeDays = flock
+    ? flock.arrival_age_weeks * 7 +
+      Math.floor(
+        (new Date(report.report_date).getTime() - new Date(flock.arrival_date).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : null
+
+  const [{ data: kpi }, { data: eggProduction }, { data: evidence }, { data: target }] = await Promise.all([
     supabase.from("daily_report_kpis").select("*").eq("daily_report_id", report.id).maybeSingle(),
     supabase.from("egg_production").select("*").eq("daily_report_id", report.id).maybeSingle(),
     supabase.from("evidence").select("*").eq("daily_report_id", report.id).order("created_at"),
+    reportAgeDays !== null
+      ? supabase
+          .from("flock_targets")
+          .select("target_hdp_pct")
+          .eq("flock_id", report.flock_id)
+          .eq("day_number", reportAgeDays)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
   ])
 
   const avgWeightGrams =
@@ -89,10 +105,17 @@ export default async function ReportDetailPage({
           {report.mortality_note && <Row label="Sebab kematian" value={report.mortality_note} />}
           <Row label="Populasi akhir" value={`${report.closing_population} ekor`} />
           <Separator />
+          {report.water_liters !== null && (
+            <Row label="Konsumsi air" value={`${report.water_liters} liter`} />
+          )}
           <Row label="Total telur" value={`${kpi?.total_eggs ?? "-"} butir`} />
-          <Row label="HDP" value={`${kpi?.hdp_pct ?? "-"}%`} />
+          <Row
+            label="HDP"
+            value={`${kpi?.hdp_pct ?? "-"}%${target?.target_hdp_pct ? ` (standar ${target.target_hdp_pct}%)` : ""}`}
+          />
           <Row label="Total pakan" value={`${kpi?.actual_feed_kg ?? "-"} kg`} />
           <Row label="Pakan/ekor/hari" value={`${kpi?.feed_intake_g_per_bird ?? "-"} g`} />
+          {kpi?.fcr !== null && kpi?.fcr !== undefined && <Row label="FCR" value={`${kpi.fcr}`} />}
           {report.notes && <Row label="Catatan" value={report.notes} />}
         </CardContent>
       </Card>

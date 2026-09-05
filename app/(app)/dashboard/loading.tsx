@@ -15,7 +15,7 @@ export default function DashboardLoading() {
       <Skeleton className="h-24 w-full rounded-xl" />
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-6">
-        {Array.from({ length: 6 }).map((_, i) => (
+        {Array.from({ length: 7 }).map((_, i) => (
           <Card key={i}>
             <CardContent className="space-y-2 py-4">
               <Skeleton className="h-8 w-8 rounded-full" />

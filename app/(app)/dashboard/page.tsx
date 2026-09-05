@@ -1,8 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Egg, Users, TrendingUp, Package, Plus, Sun, Wallet } from "lucide-react"
+import { Egg, Users, TrendingUp, Package, Plus, Sun, Wallet, Wheat } from "lucide-react"
 
-import { requireOwnerContext, flockAgeWeeks } from "@/lib/data/app-context"
+import { requireOwnerContext, flockAgeWeeks, flockAgeDays } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
 import { calcEggGrade } from "@/lib/kpi"
 import { KpiTile } from "@/components/dashboard/kpi-tile"
@@ -52,6 +52,7 @@ export default async function DashboardPage() {
     { data: salesDaily },
     { data: feedCostDaily },
     { data: supplyCostDaily },
+    { data: performanceStandard },
   ] = await Promise.all([
       supabase
         .from("daily_report_kpis")
@@ -96,6 +97,12 @@ export default async function DashboardPage() {
         .select("usage_date, supply_cost, has_unpriced")
         .eq("farm_id", farm.id)
         .gte("usage_date", rangeStartISO),
+      supabase
+        .from("flock_targets")
+        .select("target_hdp_pct")
+        .eq("flock_id", flock.id)
+        .eq("day_number", flockAgeDays(flock))
+        .maybeSingle(),
     ])
 
   const revenueByDate = new Map((salesDaily ?? []).map((d) => [d.sale_date, d.total_amount ?? 0]))
@@ -198,7 +205,18 @@ export default async function DashboardPage() {
           value={`${flock.current_population.toLocaleString("id-ID")} ekor`}
           sub={`Umur ${flockAgeWeeks(flock)} minggu`}
         />
-        <KpiTile icon={TrendingUp} label="Hen Day Production" value={`${todayKpi?.hdp_pct ?? 0}%`} />
+        <KpiTile
+          icon={TrendingUp}
+          label="Hen Day Production"
+          value={`${todayKpi?.hdp_pct ?? 0}%`}
+          sub={performanceStandard?.target_hdp_pct ? `standar ${performanceStandard.target_hdp_pct}%` : undefined}
+        />
+        <KpiTile
+          icon={Wheat}
+          label="FCR"
+          value={todayKpi?.fcr ? `${todayKpi.fcr}` : "-"}
+          sub="kg pakan/kg telur"
+        />
         <KpiTile
           icon={Package}
           label="Stok Pakan"
