@@ -55,28 +55,16 @@ export default async function ReportDetailPage({
     )
   }
 
-  const { data: kpi } = await supabase
-    .from("daily_report_kpis")
-    .select("*")
-    .eq("daily_report_id", report.id)
-    .maybeSingle()
-
-  const { data: eggProduction } = await supabase
-    .from("egg_production")
-    .select("*")
-    .eq("daily_report_id", report.id)
-    .maybeSingle()
+  const [{ data: kpi }, { data: eggProduction }, { data: evidence }] = await Promise.all([
+    supabase.from("daily_report_kpis").select("*").eq("daily_report_id", report.id).maybeSingle(),
+    supabase.from("egg_production").select("*").eq("daily_report_id", report.id).maybeSingle(),
+    supabase.from("evidence").select("*").eq("daily_report_id", report.id).order("created_at"),
+  ])
 
   const avgWeightGrams =
     eggProduction?.egg_weight_kg && eggProduction.total_eggs
       ? (Number(eggProduction.egg_weight_kg) * 1000) / eggProduction.total_eggs
       : 0
-
-  const { data: evidence } = await supabase
-    .from("evidence")
-    .select("*")
-    .eq("daily_report_id", report.id)
-    .order("created_at")
 
   const evidenceWithUrls = await Promise.all(
     (evidence ?? []).map(async (e) => {

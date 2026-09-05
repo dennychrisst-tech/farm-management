@@ -54,7 +54,7 @@ export default function LoginPage() {
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
       >
         <source src="/videos/login-background.webm" type="video/webm" />
         <source src="/videos/login-background.mp4" type="video/mp4" />

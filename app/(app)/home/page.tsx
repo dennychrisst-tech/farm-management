@@ -22,49 +22,38 @@ export default async function HomePage() {
   const supabase = await createClient()
 
   const today = todayISO()
+  const sevenDaysAgo = new Date()
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
 
-  const todayReport = flock
-    ? (
-        await supabase
+  const [{ data: todayReport }, { data: recentReports }, { data: target }] = flock
+    ? await Promise.all([
+        supabase
           .from("daily_reports")
           .select("id, status")
           .eq("flock_id", flock.id)
           .eq("report_date", today)
-          .maybeSingle()
-      ).data
-    : null
-
-  const sevenDaysAgo = new Date()
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6)
-
-  const recentReports = flock
-    ? (
-        await supabase
+          .maybeSingle(),
+        supabase
           .from("daily_reports")
           .select("report_date, status")
           .eq("flock_id", flock.id)
-          .gte("report_date", sevenDaysAgo.toISOString().slice(0, 10))
-      ).data ?? []
-    : []
+          .gte("report_date", sevenDaysAgo.toISOString().slice(0, 10)),
+        supabase
+          .from("flock_targets")
+          .select("*")
+          .eq("flock_id", flock.id)
+          .eq("day_number", flockAgeDays(flock))
+          .maybeSingle(),
+      ])
+    : [{ data: null }, { data: [] }, { data: null }]
 
-  const completedCount = recentReports.filter(
+  const completedCount = (recentReports ?? []).filter(
     (r) => r.status === "submitted" || r.status === "verified"
   ).length
 
   const status = todayReport ? STATUS_LABEL[todayReport.status] : { label: "Belum Diisi", variant: "outline" as const }
   const ctaHref = todayReport ? `/report/${todayReport.id}` : "/report/new"
   const ctaLabel = todayReport && todayReport.status === "draft" ? "Lanjutkan Laporan" : "Isi Laporan Hari Ini"
-
-  const target = flock
-    ? (
-        await supabase
-          .from("flock_targets")
-          .select("*")
-          .eq("flock_id", flock.id)
-          .eq("day_number", flockAgeDays(flock))
-          .maybeSingle()
-      ).data
-    : null
 
   return (
     <div className="space-y-4">

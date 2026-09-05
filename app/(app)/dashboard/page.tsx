@@ -49,6 +49,9 @@ export default async function DashboardPage() {
     { data: alerts },
     { data: todayEgg },
     { data: eggStockBalance },
+    { data: salesDaily },
+    { data: feedCostDaily },
+    { data: supplyCostDaily },
   ] = await Promise.all([
       supabase
         .from("daily_report_kpis")
@@ -78,25 +81,22 @@ export default async function DashboardPage() {
         .eq("daily_reports.report_date", today)
         .maybeSingle(),
       supabase.from("egg_stock_balance").select("*").eq("farm_id", farm.id).maybeSingle(),
+      supabase
+        .from("sales_daily_summary")
+        .select("sale_date, total_amount")
+        .eq("farm_id", farm.id)
+        .gte("sale_date", rangeStartISO),
+      supabase
+        .from("feed_cost_daily")
+        .select("report_date, feed_cost, has_unpriced")
+        .eq("farm_id", farm.id)
+        .gte("report_date", rangeStartISO),
+      supabase
+        .from("supply_cost_daily")
+        .select("usage_date, supply_cost, has_unpriced")
+        .eq("farm_id", farm.id)
+        .gte("usage_date", rangeStartISO),
     ])
-
-  const [{ data: salesDaily }, { data: feedCostDaily }, { data: supplyCostDaily }] = await Promise.all([
-    supabase
-      .from("sales_daily_summary")
-      .select("sale_date, total_amount")
-      .eq("farm_id", farm.id)
-      .gte("sale_date", rangeStartISO),
-    supabase
-      .from("feed_cost_daily")
-      .select("report_date, feed_cost, has_unpriced")
-      .eq("farm_id", farm.id)
-      .gte("report_date", rangeStartISO),
-    supabase
-      .from("supply_cost_daily")
-      .select("usage_date, supply_cost, has_unpriced")
-      .eq("farm_id", farm.id)
-      .gte("usage_date", rangeStartISO),
-  ])
 
   const revenueByDate = new Map((salesDaily ?? []).map((d) => [d.sale_date, d.total_amount ?? 0]))
   const feedCostByDate = new Map((feedCostDaily ?? []).map((d) => [d.report_date, d.feed_cost ?? 0]))
