@@ -43,6 +43,10 @@ export const getAppContext = cache(async (): Promise<AppContext> => {
     redirect("/login")
   }
 
+  if (!profile.active) {
+    redirect("/pending-approval")
+  }
+
   const { data: farm } = await supabase
     .from("farms")
     .select("*")

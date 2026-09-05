@@ -16,8 +16,9 @@ export default async function UsersSettingsPage() {
     <div className="space-y-4">
       <h1 className="text-2xl font-bold tracking-tight">Pengguna</h1>
       <p className="text-sm text-muted-foreground">
-        Penambahan akun baru saat ini dilakukan lewat Supabase Dashboard (Authentication → Users),
-        lalu tambahkan baris profil dengan role yang sesuai.
+        Pekerja bisa mendaftar sendiri lewat halaman login. Akun baru selalu berperan worker dan
+        berstatus nonaktif sampai diaktifkan di sini. Peran admin hanya bisa diberikan secara manual
+        oleh Owner/Admin yang sudah ada.
       </p>
       <UsersClient users={users ?? []} currentUserId={userId} />
     </div>

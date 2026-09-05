@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -107,6 +108,12 @@ export default function LoginPage() {
               <Button type="submit" className="w-full" disabled={submitting}>
                 {submitting ? "Memproses..." : "Masuk"}
               </Button>
+              <p className="text-center text-sm text-muted-foreground">
+                Belum punya akun?{" "}
+                <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
+                  Daftar di sini
+                </Link>
+              </p>
             </form>
           </Form>
         </CardContent>

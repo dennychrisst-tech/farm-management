@@ -8,6 +8,13 @@ import type { Tables } from "@/lib/types/database"
 import { Card, CardContent } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 type Profile = Tables<"profiles">
 
@@ -28,21 +35,54 @@ export function UsersClient({ users, currentUserId }: { users: Profile[]; curren
     router.refresh()
   }
 
+  async function changeRole(u: Profile, role: string) {
+    if (u.id === currentUserId) {
+      toast.error("Tidak bisa mengubah peran akun sendiri")
+      return
+    }
+    const supabase = createClient()
+    const { error } = await supabase.from("profiles").update({ role }).eq("id", u.id)
+    if (error) {
+      toast.error("Gagal mengubah peran", { description: error.message })
+      return
+    }
+    toast.success(`${u.name} sekarang ${role}`)
+    router.refresh()
+  }
+
   return (
     <div className="space-y-2">
       {users.map((u) => (
         <Card key={u.id}>
-          <CardContent className="flex items-center justify-between py-3">
+          <CardContent className="flex flex-wrap items-center justify-between gap-2 py-3">
             <div>
               <p className="text-sm font-medium">{u.name}</p>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Badge variant="outline" className="capitalize">
                   {u.role}
                 </Badge>
+                {!u.active && <Badge variant="destructive">Menunggu Aktivasi</Badge>}
                 {u.phone && <span className="text-xs text-muted-foreground">{u.phone}</span>}
               </div>
             </div>
-            <Switch checked={u.active} onCheckedChange={() => toggleActive(u)} />
+            <div className="flex items-center gap-3">
+              {u.role !== "owner" && (
+                <Select
+                  value={u.role}
+                  onValueChange={(role) => changeRole(u, role)}
+                  disabled={u.id === currentUserId}
+                >
+                  <SelectTrigger className="h-8 w-28">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="worker">Worker</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+              <Switch checked={u.active} onCheckedChange={() => toggleActive(u)} disabled={u.id === currentUserId} />
+            </div>
           </CardContent>
         </Card>
       ))}
