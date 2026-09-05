@@ -188,7 +188,7 @@ export default async function DashboardPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-transparent to-primary/40" />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-primary/60 to-primary" />
         </div>
       </Card>
 
