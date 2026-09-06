@@ -9,15 +9,17 @@ export function KpiTile({
   sub,
   tone,
   icon: Icon,
+  className,
 }: {
   label: string
   value: string
   sub?: string
   tone?: "default" | "warning" | "danger"
   icon?: LucideIcon
+  className?: string
 }) {
   return (
-    <Card className="gap-3 py-4">
+    <Card className={cn("gap-3 py-4", className)}>
       <CardContent className="flex items-start gap-3 px-4">
         {Icon && (
           <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
@@ -28,7 +30,7 @@ export function KpiTile({
           <p className="text-sm text-muted-foreground">{label}</p>
           <p
             className={cn(
-              "text-2xl font-bold tracking-tight tabular-nums",
+              "text-xl font-bold tracking-tight tabular-nums sm:text-2xl",
               tone === "warning" && "text-yellow-600 dark:text-yellow-500",
               tone === "danger" && "text-destructive"
             )}

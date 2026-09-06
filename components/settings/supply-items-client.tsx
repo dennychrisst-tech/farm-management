@@ -130,7 +130,7 @@ export function SupplyItemsClient({
         <CardContent className="space-y-2 py-3">
           <p className="text-sm font-medium">Tambah Item Obat/Suplemen</p>
           <Input placeholder="Nama (mis. Kumabit)" value={newName} onChange={(e) => setNewName(e.target.value)} />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Select value={newCategory} onValueChange={setNewCategory}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -147,6 +147,7 @@ export function SupplyItemsClient({
           </div>
           <Input
             type="number"
+            inputMode="decimal"
             min={0}
             step={0.1}
             placeholder="Stok minimum (alert jika di bawah ini)"

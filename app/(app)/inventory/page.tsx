@@ -55,13 +55,15 @@ export default async function InventoryPage() {
       <h1 className="text-2xl font-bold tracking-tight">Inventory</h1>
 
       <Tabs defaultValue="feed">
-        <TabsList className="flex-wrap h-auto">
-          <TabsTrigger value="feed">Pakan</TabsTrigger>
-          <TabsTrigger value="supplies">Obat &amp; Suplemen</TabsTrigger>
-          <TabsTrigger value="eggsales">Jual Telur</TabsTrigger>
-          <TabsTrigger value="opname">Stock Opname</TabsTrigger>
-          <TabsTrigger value="po">Pesanan (PO)</TabsTrigger>
-        </TabsList>
+        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:overflow-visible sm:px-0">
+          <TabsList className="w-max sm:w-fit">
+            <TabsTrigger value="feed">Pakan</TabsTrigger>
+            <TabsTrigger value="supplies">Obat &amp; Suplemen</TabsTrigger>
+            <TabsTrigger value="eggsales">Jual Telur</TabsTrigger>
+            <TabsTrigger value="opname">Stock Opname</TabsTrigger>
+            <TabsTrigger value="po">Pesanan (PO)</TabsTrigger>
+          </TabsList>
+        </div>
         <TabsContent value="feed" className="mt-4">
           <FeedList items={feedStock ?? []} />
         </TabsContent>

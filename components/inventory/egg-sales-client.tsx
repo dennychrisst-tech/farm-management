@@ -138,9 +138,10 @@ export function EggSalesClient({
             value={buyerName}
             onChange={(e) => setBuyerName(e.target.value)}
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Input
               type="number"
+              inputMode="numeric"
               min={0}
               placeholder="Piring (30 butir)"
               value={trays}
@@ -148,6 +149,7 @@ export function EggSalesClient({
             />
             <Input
               type="number"
+              inputMode="numeric"
               min={0}
               placeholder="Butir lepas"
               value={loose}
@@ -156,13 +158,14 @@ export function EggSalesClient({
           </div>
           <Input
             type="number"
+            inputMode="decimal"
             min={0}
             step={500}
             placeholder="Harga per piring (30 butir)"
             value={pricePerTray}
             onChange={(e) => setPricePerTray(e.target.value)}
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Select value={paymentStatus} onValueChange={setPaymentStatus}>
               <SelectTrigger className="w-full">
                 <SelectValue />
@@ -175,6 +178,7 @@ export function EggSalesClient({
             </Select>
             <Input
               type="number"
+              inputMode="decimal"
               min={0}
               placeholder="Jumlah dibayar"
               value={amountPaid}

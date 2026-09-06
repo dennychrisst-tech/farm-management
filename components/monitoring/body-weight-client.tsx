@@ -112,9 +112,10 @@ export function BodyWeightClient({
         <CardContent className="space-y-2 py-3">
           <p className="text-sm font-medium">Catat Sampel Berat Badan</p>
           <Input type="date" value={sampleDate} onChange={(e) => setSampleDate(e.target.value)} />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Input
               type="number"
+              inputMode="numeric"
               min={1}
               placeholder="Jumlah sampel (ekor)"
               value={sampleCount}
@@ -122,6 +123,7 @@ export function BodyWeightClient({
             />
             <Input
               type="number"
+              inputMode="numeric"
               min={0}
               step={1}
               placeholder="Rata-rata berat (gram)"

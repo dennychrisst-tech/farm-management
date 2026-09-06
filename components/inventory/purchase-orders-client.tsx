@@ -196,7 +196,7 @@ export function PurchaseOrdersClient({
             value={supplierName}
             onChange={(e) => setSupplierName(e.target.value)}
           />
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Select
               value={itemKind}
               onValueChange={(v) => {
@@ -225,9 +225,10 @@ export function PurchaseOrdersClient({
               </SelectContent>
             </Select>
           </div>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             <Input
               type="number"
+              inputMode="decimal"
               min={0}
               step={0.1}
               placeholder={`Jumlah dipesan (${itemKind === "feed" ? "kg" : "unit"})`}
@@ -236,6 +237,7 @@ export function PurchaseOrdersClient({
             />
             <Input
               type="number"
+              inputMode="decimal"
               min={0}
               placeholder="Harga satuan (opsional)"
               value={unitPrice}

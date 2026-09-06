@@ -64,7 +64,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden p-4">
+    <div className="relative flex min-h-full flex-1 flex-col items-center justify-center overflow-hidden p-4">
       <video
         className="absolute inset-0 -z-20 h-full w-full object-cover"
         autoPlay
@@ -78,17 +78,21 @@ export default function RegisterPage() {
       </video>
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
 
+      <span className="mb-4 flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white shadow-lg ring-1 ring-black/5">
+        <Image src="/images/logo-master.png" alt="Bangun Layer Farm" width={80} height={80} className="size-full object-cover" priority />
+      </span>
+
       <Card className="w-full max-w-sm border-white/15 bg-white/90 backdrop-blur-md dark:bg-black/60">
         {needsEmailConfirm ? (
           <>
             <CardHeader>
-              <div className="mb-1 flex items-center gap-3">
+              <div className="mb-1 flex justify-center">
                 <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground">
                   <MailCheck className="size-5" />
                 </span>
-                <CardTitle className="text-xl leading-tight">Cek Email Anda</CardTitle>
               </div>
-              <CardDescription>
+              <CardTitle className="text-center text-xl leading-tight">Cek Email Anda</CardTitle>
+              <CardDescription className="text-center">
                 Kami sudah kirim link konfirmasi ke email Anda. Setelah dikonfirmasi, login lalu
                 tunggu akun Anda diaktifkan oleh Owner/Admin farm.
               </CardDescription>
@@ -102,20 +106,8 @@ export default function RegisterPage() {
         ) : (
           <>
             <CardHeader>
-              <div className="mb-1 flex items-center gap-3">
-                <span className="flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
-                  <Image
-                    src="/images/logo-master.png"
-                    alt="Bangun Layer Farm"
-                    width={48}
-                    height={48}
-                    className="size-full object-cover"
-                    priority
-                  />
-                </span>
-                <CardTitle className="text-xl leading-tight">Daftar Akun Pekerja</CardTitle>
-              </div>
-              <CardDescription>
+              <CardTitle className="text-center text-xl leading-tight">Daftar Akun Pekerja</CardTitle>
+              <CardDescription className="text-center">
                 Akun baru dibuat dengan peran pekerja dan menunggu aktivasi Owner/Admin sebelum
                 bisa mengisi laporan.
               </CardDescription>
@@ -143,7 +135,7 @@ export default function RegisterPage() {
                       <FormItem>
                         <FormLabel>No. HP (opsional)</FormLabel>
                         <FormControl>
-                          <Input autoComplete="tel" placeholder="08xxxxxxxxxx" {...field} />
+                          <Input autoComplete="tel" inputMode="tel" placeholder="08xxxxxxxxxx" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

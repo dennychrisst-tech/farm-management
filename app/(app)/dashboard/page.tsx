@@ -239,6 +239,7 @@ export default async function DashboardPage() {
           label="Pendapatan Hari Ini"
           value={`Rp ${Math.round(todayRevenue).toLocaleString("id-ID")}`}
           sub="dari penjualan telur"
+          className="col-span-2 lg:col-span-1"
         />
       </div>
 

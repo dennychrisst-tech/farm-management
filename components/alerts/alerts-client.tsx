@@ -70,11 +70,11 @@ export function AlertsClient({ initialAlerts }: { initialAlerts: Alert[] }) {
                   </p>
                 </div>
                 {a.status !== "resolved" && (
-                  <div className="flex gap-1">
+                  <div className="flex gap-2">
                     {a.status === "open" && (
                       <Button
                         variant="ghost"
-                        size="icon-sm"
+                        size="icon"
                         disabled={pendingId === a.id}
                         onClick={() => updateStatus(a.id, "acknowledged")}
                         aria-label="Tandai dilihat"
@@ -84,7 +84,7 @@ export function AlertsClient({ initialAlerts }: { initialAlerts: Alert[] }) {
                     )}
                     <Button
                       variant="ghost"
-                      size="icon-sm"
+                      size="icon"
                       disabled={pendingId === a.id}
                       onClick={() => updateStatus(a.id, "resolved")}
                       aria-label="Selesaikan"
