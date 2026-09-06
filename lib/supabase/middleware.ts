@@ -29,16 +29,26 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const isAuthRoute =
-    request.nextUrl.pathname.startsWith("/login") || request.nextUrl.pathname.startsWith("/register")
+  const pathname = request.nextUrl.pathname
 
-  if (!user && !isAuthRoute) {
+  // The password-recovery callback manages its own redirects (it exchanges
+  // the recovery code for a session before a user cookie exists yet), so it
+  // must never be intercepted by the checks below.
+  if (pathname.startsWith("/auth/confirm")) {
+    return supabaseResponse
+  }
+
+  const isPublicAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register")
+  const isPasswordResetRoute =
+    pathname.startsWith("/forgot-password") || pathname.startsWith("/reset-password")
+
+  if (!user && !isPublicAuthRoute && !isPasswordResetRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/login"
     return NextResponse.redirect(url)
   }
 
-  if (user && isAuthRoute) {
+  if (user && isPublicAuthRoute) {
     const url = request.nextUrl.clone()
     url.pathname = "/home"
     return NextResponse.redirect(url)

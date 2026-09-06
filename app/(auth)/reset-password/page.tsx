@@ -1,15 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import Image from "next/image"
 
 import { createClient } from "@/lib/supabase/client"
-import { loginSchema, type LoginInput } from "@/lib/validation/auth"
+import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validation/auth"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -22,35 +21,26 @@ import {
 } from "@/components/ui/form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function LoginPage() {
+export default function ResetPasswordPage() {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false)
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+  const form = useForm<ResetPasswordInput>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: "", confirmPassword: "" },
   })
 
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    if (params.get("error") === "link-expired") {
-      toast.error("Link sudah tidak berlaku", {
-        description: "Silakan minta link reset password baru.",
-      })
-    }
-  }, [])
-
-  async function onSubmit(values: LoginInput) {
+  async function onSubmit(values: ResetPasswordInput) {
     setSubmitting(true)
     const supabase = createClient()
-    const { error } = await supabase.auth.signInWithPassword(values)
+    const { error } = await supabase.auth.updateUser({ password: values.password })
     setSubmitting(false)
 
     if (error) {
-      toast.error("Login gagal", { description: error.message })
+      toast.error("Gagal mengubah password", { description: error.message })
       return
     }
-
+    toast.success("Password berhasil diubah")
     router.replace("/home")
     router.refresh()
   }
@@ -76,25 +66,22 @@ export default function LoginPage() {
 
       <Card className="w-full max-w-sm border-white/15 bg-white/90 backdrop-blur-md dark:bg-black/60">
         <CardHeader>
-          <CardTitle className="text-center text-xl leading-tight">Bangun Layer Farm</CardTitle>
-          <CardDescription className="text-center">Masuk untuk mengisi laporan harian farm.</CardDescription>
+          <CardTitle className="text-center text-xl leading-tight">Buat Password Baru</CardTitle>
+          <CardDescription className="text-center">
+            Masukkan password baru untuk akun Anda.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField
                 control={form.control}
-                name="email"
+                name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Password Baru</FormLabel>
                     <FormControl>
-                      <Input
-                        type="email"
-                        autoComplete="username"
-                        placeholder="nama@layerfarm-pilot.id"
-                        {...field}
-                      />
+                      <Input type="password" autoComplete="new-password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -102,34 +89,20 @@ export default function LoginPage() {
               />
               <FormField
                 control={form.control}
-                name="password"
+                name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex items-center justify-between">
-                      <FormLabel>Password</FormLabel>
-                      <Link
-                        href="/forgot-password"
-                        className="text-xs font-medium text-primary underline-offset-4 hover:underline"
-                      >
-                        Lupa password?
-                      </Link>
-                    </div>
+                    <FormLabel>Ulangi Password</FormLabel>
                     <FormControl>
-                      <Input type="password" autoComplete="current-password" {...field} />
+                      <Input type="password" autoComplete="new-password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
               <Button type="submit" className="w-full" disabled={submitting}>
-                {submitting ? "Memproses..." : "Masuk"}
+                {submitting ? "Menyimpan..." : "Simpan Password Baru"}
               </Button>
-              <p className="text-center text-sm text-muted-foreground">
-                Belum punya akun?{" "}
-                <Link href="/register" className="font-medium text-primary underline-offset-4 hover:underline">
-                  Daftar di sini
-                </Link>
-              </p>
             </form>
           </Form>
         </CardContent>
