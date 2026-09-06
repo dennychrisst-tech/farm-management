@@ -3,6 +3,7 @@ import { ChevronRight, Building2, Wheat, SlidersHorizontal, Users } from "lucide
 
 import { requireOwnerContext } from "@/lib/data/app-context"
 import { Card, CardContent } from "@/components/ui/card"
+import { PushNotificationsCard } from "@/components/settings/push-notifications-card"
 
 const links = [
   { href: "/settings/farm", label: "Data Farm", icon: Building2 },
@@ -12,11 +13,12 @@ const links = [
 ]
 
 export default async function SettingsPage() {
-  await requireOwnerContext()
+  const { userId } = await requireOwnerContext()
 
   return (
     <div className="space-y-4">
       <h1 className="text-2xl font-bold tracking-tight">Pengaturan</h1>
+      <PushNotificationsCard userId={userId} />
       <div className="space-y-2">
         {links.map((l) => (
           <Link key={l.href} href={l.href}>

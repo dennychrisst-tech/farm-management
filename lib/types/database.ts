@@ -1328,6 +1328,41 @@ export type Database = {
           },
         ]
       }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stock_counts: {
         Row: {
           counted_at: string
@@ -2066,6 +2101,7 @@ export type Database = {
         Args: { p_report_id: string }
         Returns: undefined
       }
+      get_push_secrets: { Args: never; Returns: Json }
       receive_purchase_order: {
         Args: { p_po_id: string; p_qty_received: number; p_reference?: string }
         Returns: {

@@ -4,6 +4,7 @@ import { getAppContext } from "@/lib/data/app-context"
 import { createClient } from "@/lib/supabase/server"
 import { calcEggGrade } from "@/lib/kpi"
 import { ReportForm } from "@/components/report/report-form"
+import { ReportVerifyActions, type CorrectionFeedRow } from "@/components/report/report-verify-actions"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
@@ -20,7 +21,8 @@ export default async function ReportDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const { farm, flock } = await getAppContext()
+  const { farm, flock, userId, profile } = await getAppContext()
+  const isOwner = profile.role === "owner" || profile.role === "admin"
   const supabase = await createClient()
 
   const { data: report } = await supabase
@@ -63,7 +65,15 @@ export default async function ReportDetailPage({
       )
     : null
 
-  const [{ data: kpi }, { data: eggProduction }, { data: evidence }, { data: target }] = await Promise.all([
+  const [
+    { data: kpi },
+    { data: eggProduction },
+    { data: evidence },
+    { data: target },
+    { data: feedUsage },
+    { data: feedProducts },
+    { data: verifiedByProfile },
+  ] = await Promise.all([
     supabase.from("daily_report_kpis").select("*").eq("daily_report_id", report.id).maybeSingle(),
     supabase.from("egg_production").select("*").eq("daily_report_id", report.id).maybeSingle(),
     supabase.from("evidence").select("*").eq("daily_report_id", report.id).order("created_at"),
@@ -74,6 +84,15 @@ export default async function ReportDetailPage({
           .eq("flock_id", report.flock_id)
           .eq("day_number", reportAgeDays)
           .maybeSingle()
+      : Promise.resolve({ data: null }),
+    isOwner
+      ? supabase.from("feed_usage").select("*").eq("daily_report_id", report.id)
+      : Promise.resolve({ data: null }),
+    isOwner
+      ? supabase.from("feed_products").select("*").eq("farm_id", farm.id).eq("active", true).order("sequence_order")
+      : Promise.resolve({ data: null }),
+    report.verified_by
+      ? supabase.from("profiles").select("name").eq("id", report.verified_by).maybeSingle()
       : Promise.resolve({ data: null }),
   ])
 
@@ -89,12 +108,46 @@ export default async function ReportDetailPage({
     })
   )
 
+  const feedRows: CorrectionFeedRow[] = (feedUsage ?? []).map((f) => ({
+    session: f.session === "evening" ? "evening" : "morning",
+    feedProductId: f.feed_product_id ?? "",
+    sacks: Number(f.sacks ?? 0),
+    looseKg: Number(f.loose_kg ?? 0),
+  }))
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold tracking-tight">Laporan Harian — {report.report_date}</h1>
         <Badge>{STATUS_LABEL[report.status] ?? report.status}</Badge>
       </div>
+      {report.status === "verified" && report.verified_at && (
+        <p className="text-xs text-muted-foreground">
+          Diverifikasi oleh {verifiedByProfile?.name ?? "Owner/Admin"} pada{" "}
+          {new Date(report.verified_at).toLocaleString("id-ID")}
+        </p>
+      )}
+      {isOwner && (
+        <ReportVerifyActions
+          reportId={report.id}
+          status={report.status}
+          currentUserId={userId}
+          mortality={report.mortality}
+          cull={report.cull}
+          populationAdjustment={report.population_adjustment}
+          normalTrays={eggProduction?.normal_trays ?? 0}
+          normalLoose={eggProduction?.normal_loose ?? 0}
+          defectCracked={eggProduction?.defect_cracked ?? 0}
+          defectDirty={eggProduction?.defect_dirty ?? 0}
+          defectThinShell={eggProduction?.defect_thin_shell ?? 0}
+          defectDoubleYolk={eggProduction?.defect_double_yolk ?? 0}
+          defectUndersized={eggProduction?.defect_undersized ?? 0}
+          defectOther={eggProduction?.defect_other ?? 0}
+          eggWeightKg={eggProduction?.egg_weight_kg !== undefined && eggProduction?.egg_weight_kg !== null ? Number(eggProduction.egg_weight_kg) : null}
+          feedRows={feedRows}
+          feedProducts={feedProducts ?? []}
+        />
+      )}
       <Card>
         <CardHeader className="pb-2">
           <CardTitle className="text-sm font-medium">Ringkasan</CardTitle>

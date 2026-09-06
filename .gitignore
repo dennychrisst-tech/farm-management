@@ -51,3 +51,6 @@ next-env.d.ts
 
 # Android signing key + build artifacts (never commit signing material)
 /android-release/
+
+# supabase CLI local cache
+/supabase/.temp/

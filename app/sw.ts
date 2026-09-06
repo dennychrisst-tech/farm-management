@@ -21,3 +21,26 @@ const serwist = new Serwist({
 })
 
 serwist.addEventListeners()
+
+self.addEventListener("push", (event) => {
+  if (!event.data) return
+  let data: { title?: string; body?: string; tag?: string }
+  try {
+    data = event.data.json()
+  } catch {
+    data = { body: event.data.text() }
+  }
+  event.waitUntil(
+    self.registration.showNotification(data.title ?? "LayerFarm", {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      tag: data.tag,
+    })
+  )
+})
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close()
+  event.waitUntil(self.clients.openWindow("/alerts"))
+})
